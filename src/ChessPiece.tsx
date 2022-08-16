@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { PieceColor, PieceType } from "../Types";
+import { PieceColor, PieceType } from "./Types";
 
 interface Props {
   pieceType: PieceType;

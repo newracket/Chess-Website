@@ -1,6 +1,6 @@
 import { Component } from "react";
-import { checkForCheckmate, findMoves, isKingInCheck } from "../chessmovepossibilities";
-import { Board, PieceColor, PieceType } from '../Types';
+import { checkForCheckmate, findMoves, isKingInCheck } from "./chessmovepossibilities";
+import { Board, PieceColor, PieceType } from './Types';
 import ChessPiece from "./ChessPiece";
 
 interface Props {
@@ -15,21 +15,28 @@ interface Props {
   check: PieceColor;
   turn: PieceColor;
   board: Board;
+  winner: PieceColor;
+  computerMoving: boolean;
   row: number;
   col: number;
+  setComputerMoving: Function;
   setBoard: Function;
   setCheck: Function;
   setTurn: Function;
   setWinner: Function;
   flipBoard: Function;
+  computerMove: Function;
+  pvc: boolean;
 }
 
 export default class ChessSquare extends Component<Props> {
   handleClick() {
+    if (this.props.computerMoving || this.props.winner) return;
+
     const currentItem = this.props.stats;
 
     // If the king is currently in check
-    if (this.props.check && this.props.check === currentItem.color) {
+    if (this.props.check && this.props.check === currentItem.color && currentItem.color === this.props.turn) {
       this.handleCheck();
     }
     // If the clicked square has a piece and it's that colors turn
@@ -52,7 +59,7 @@ export default class ChessSquare extends Component<Props> {
     // Loops through all possible moves
     possibleMoves.forEach(possibleMove => {
       // Makes the move in a separate test board
-      const testBoard = JSON.parse(JSON.stringify(newBoard));
+      const testBoard: Board = JSON.parse(JSON.stringify(newBoard));
 
       testBoard[possibleMove.row][possibleMove.col].piece = currentItem.piece;
       testBoard[possibleMove.row][possibleMove.col].color = currentItem.color;
@@ -60,8 +67,9 @@ export default class ChessSquare extends Component<Props> {
       testBoard[this.props.row][this.props.col].piece = null;
       testBoard[this.props.row][this.props.col].color = null;
 
+      const flippedBoard = testBoard.map(row => row.reverse()).reverse();
       // Checks if king is in check after move is made
-      if (!isKingInCheck(testBoard)) {
+      if (!isKingInCheck(flippedBoard)) {
         newBoard[possibleMove.row][possibleMove.col].movable = true;
       }
     });
@@ -81,7 +89,19 @@ export default class ChessSquare extends Component<Props> {
       currentItem.selected = true;
 
       findMoves(newBoard, currentItem.piece, currentItem.color, this.props.row, this.props.col).forEach(possibleMove => {
-        newBoard[possibleMove.row][possibleMove.col].movable = true;
+        const testBoard: Board = JSON.parse(JSON.stringify(newBoard));
+
+        testBoard[possibleMove.row][possibleMove.col].piece = currentItem.piece;
+        testBoard[possibleMove.row][possibleMove.col].color = currentItem.color;
+
+        testBoard[this.props.row][this.props.col].piece = null;
+        testBoard[this.props.row][this.props.col].color = null;
+
+        const flippedBoard = testBoard.map(row => row.reverse()).reverse();
+        const kingPosition = isKingInCheck(flippedBoard);
+        if (!kingPosition || flippedBoard[kingPosition.row][kingPosition.col].color !== this.props.stats.color) {
+          newBoard[possibleMove.row][possibleMove.col].movable = true;
+        }
       });
     }
 
@@ -111,7 +131,7 @@ export default class ChessSquare extends Component<Props> {
     const kingPosition = isKingInCheck(newBoard);
     if (kingPosition) {
       newBoard[kingPosition.row][kingPosition.col].check = true;
-      this.props.setCheck(this.props.turn === "white" ? "black" : "white");
+      this.props.setCheck(newBoard[kingPosition.row][kingPosition.col].color);
     }
     // Checks if king is currently in check and move removes king from check
     else if (this.props.check) {
@@ -120,12 +140,22 @@ export default class ChessSquare extends Component<Props> {
     }
 
     this.props.setBoard(newBoard);
-    this.props.setTurn(this.props.turn === "white" ? "black" : "white");
-    const flippedBoard = this.props.flipBoard();
 
+    const testBoard: Board = JSON.parse(JSON.stringify(newBoard));
+    const flippedBoard = testBoard.map(row => row.reverse()).reverse();
     if (checkForCheckmate(flippedBoard, currentItem.color === "white" ? "black" : "white")) {
-      this.props.setWinner(currentItem.color);
+      return this.props.setWinner(currentItem.color);
     }
+
+    if (this.props.pvc) {
+      this.props.setComputerMoving(true);
+      setTimeout(() => this.props.computerMove([selectedCol, 8 - selectedRow], [this.props.col, 8 - this.props.row]), 1);
+    } else {
+      this.props.flipBoard();
+      this.props.setTurn(this.props.turn === "white" ? "black" : "white");
+    }
+
+
   }
 
   deselectAll(board: Board) {
@@ -148,7 +178,11 @@ export default class ChessSquare extends Component<Props> {
     }
 
     if (this.props.stats.check) {
-      classes += " check";
+      if (this.props.winner) {
+        classes += " checkmate";
+      } else {
+        classes += " check";
+      }
     }
 
     return (

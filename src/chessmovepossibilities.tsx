@@ -15,14 +15,14 @@ export function findMoves(board: Board, piece: PieceType, color: PieceColor, row
   const tilesWithPossibleMoves: number[][][] = [];
 
   if (piece === "pawn") {
-    tilesWithPossibleMoves.push(...[
-      [[-1, 0]]
-    ]);
+    // Pawn normal move
+    if (!board[row - 1][col].piece) {
+      addPossibility(board, moves, color, { row: row - 1, col })
+    }
 
-    // Pawn edge cases
     // Pawn first move
-    if (row === 6 && !board[row - 2][col].piece) {
-      addPossibility(board, moves, color, { row: row - 2, col: col });
+    if (row === 6 && !board[row - 2][col].piece && !board[row - 1][col].piece) {
+      addPossibility(board, moves, color, { row: row - 2, col });
     }
 
     // Capture diaganol left
@@ -128,30 +128,27 @@ export function isKingInCheck(board: Board): RowCol | false {
 }
 
 export function checkForCheckmate(board: Board, color: PieceColor): boolean {
-  let checkmate = true;
+  const col = board.map(row => row.findIndex(col => col.piece === "king" && col.color === color)).filter(i => i !== -1)[0];
+  const row = board.findIndex(row => row[col].piece === "king" && row[col].color === color);
+  const piece = board[row][col];
 
-  board.forEach((row, rowNum) => {
-    row.forEach((square, colNum) => {
-      if (square.piece && square.color === color) {
-        findMoves(board, square.piece, square.color, rowNum, colNum)
-          .forEach((possibleMove: RowCol) => {
-            const testBoard = JSON.parse(JSON.stringify(board));
+  const kingMoves = findMoves(board, piece.piece, piece.color, row, col).filter(possibleMove => {
+    const testBoard: Board = JSON.parse(JSON.stringify(board));
 
-            testBoard[possibleMove.row][possibleMove.col].piece = square.piece;
-            testBoard[possibleMove.row][possibleMove.col].color = square.color;
+    testBoard[possibleMove.row][possibleMove.col].piece = piece.piece;
+    testBoard[possibleMove.row][possibleMove.col].color = piece.color;
 
-            testBoard[rowNum][colNum].piece = null;
-            testBoard[rowNum][colNum].color = null;
+    testBoard[row][col].piece = null;
+    testBoard[row][col].color = null;
 
-            if (!isKingInCheck(testBoard)) {
-              checkmate = false;
-            }
-          });
-      }
-    });
+    const flippedBoard = testBoard.map(row => row.reverse()).reverse();
+    return !isKingInCheck(flippedBoard);
   });
 
-  return checkmate;
+  console.log(piece.check);
+  console.log(kingMoves)
+
+  return piece.check && kingMoves.length === 0;
 }
 
 export function addPossibility(board: Board, array: RowCol[], color: PieceColor, rowCol: RowCol): void {

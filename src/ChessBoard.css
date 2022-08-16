@@ -1,0 +1,95 @@
+.container {
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.titleDiv {
+    height: 15vh;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.chessBoardTitle {
+    color: white;
+    font-size: 8vh;
+    margin: 0;
+}
+
+.chessBoardContainer {
+    height: 85vh;
+}
+
+.chessBoardTable {
+    border: 3px solid rgb(0, 0, 0);
+    border-spacing: 0px;
+    display: inline-block;
+    position: relative;
+}
+
+.white,
+.black {
+    width: 10vmin;
+    height: 10vmin;
+    padding: 0px;
+}
+
+.white {
+    background-color: white;
+}
+
+.black {
+    background-color: rgb(1, 166, 172);
+}
+
+.chessPiece {
+    cursor: pointer;
+    width: 90%;
+    height: 90%;
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
+.dot {
+    height: 3vmin;
+    width: 3vmin;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.movable {
+    cursor: pointer;
+}
+
+.corners {
+    background-color: #bbb !important;
+}
+
+.check {
+    background-color: red !important;
+}
+
+.checkmate {
+    background-color: rgb(132, 0, 255) !important;
+}
+
+.selected {
+    background-color: rgb(40, 134, 40) !important;
+}
+
+.winnerDisplay {
+    position: absolute;
+    background-color: white;
+    height: 40vh;
+    width: 60vmin;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}

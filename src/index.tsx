@@ -1,23 +1,25 @@
 import React from 'react';
 import { createRoot } from "react-dom/client";
-import ChessBoard from './chessboard/ChessBoard';
-import './index.css';
+import StartScreen from './StartScreen';
 
-class App extends React.Component {
-  render() {
-    return (
-      <div>
-        <h1 className="title">Chess Game</h1>
-        <ChessBoard />
-      </div>
-    );
-  }
-}
+import {
+  BrowserRouter,
+  Routes,
+  Route
+} from "react-router-dom";
+import PlayerVsPlayer from './PlayerVsPlayer';
+import PlayerVsComputer from './PlayerVsComputer';
 
 const container = document.getElementById("root");
 const root = createRoot(container!);
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<StartScreen />} />
+        <Route path="/pvp" element={<PlayerVsPlayer />} />
+        <Route path="/pvc" element={<PlayerVsComputer />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );
