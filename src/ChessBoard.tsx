@@ -3,7 +3,7 @@ import defaultBoard from './defaultboard';
 import { Board, PieceColor } from './Types';
 import ChessSquare from './ChessSquare';
 import "./ChessBoard.css";
-import { checkForCheckmate, isKingInCheck } from './chessmovepossibilities';
+import { checkForCheckmate, isKingInCheck, replacePieceValues } from './chessmovepossibilities';
 
 interface Props {
   pvc: boolean;
@@ -16,13 +16,14 @@ interface State {
   check: PieceColor;
   winner: PieceColor;
   computerMoving: boolean;
+  moveNum: number;
 }
 
 export default class ChessBoard extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = { board: defaultBoard, turn: "white", check: null, winner: null, computerMoving: false };
+    this.state = { board: defaultBoard, turn: "white", check: null, winner: null, computerMoving: false, moveNum: 0 };
     this.setBoard = this.setBoard.bind(this);
     this.setTurn = this.setTurn.bind(this);
     this.flipBoard = this.flipBoard.bind(this);
@@ -30,6 +31,7 @@ export default class ChessBoard extends Component<Props, State> {
     this.setWinner = this.setWinner.bind(this);
     this.computerMove = this.computerMove.bind(this);
     this.setComputerMoving = this.setComputerMoving.bind(this);
+    this.incrementMoveNum = this.incrementMoveNum.bind(this);
   }
 
   setBoard(newBoardTemplate: Board) {
@@ -60,21 +62,33 @@ export default class ChessBoard extends Component<Props, State> {
     });
   }
 
+  incrementMoveNum() {
+    this.setState({
+      moveNum: this.state.moveNum + 1
+    });
+  }
+
   computerMove(playerMoveFrom: number[], playerMoveTo: number[]) {
     const letters = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
     this.props.game.move(`${letters[playerMoveFrom[0]]}${playerMoveFrom[1]}`, `${letters[playerMoveTo[0]]}${playerMoveTo[1]}`);
     const computerMove = this.props.game.aiMove(2);
+    console.log(computerMove);
     const fromPosition = Object.keys(computerMove)[0];
     const toPosition = computerMove[fromPosition];
 
-    const boardFromPosition = this.state.board[8 - parseInt(fromPosition[1])][letters.indexOf(fromPosition[0])];
-    const boardToPosition = this.state.board[8 - parseInt(toPosition[1])][letters.indexOf(toPosition[0])];
+    const fromPositionIndexes = [8 - parseInt(fromPosition[1]), letters.indexOf(fromPosition[0])];
+    const toPositionIndexes = [8 - parseInt(toPosition[1]), letters.indexOf(toPosition[0])];
 
-    boardToPosition.piece = boardFromPosition.piece;
-    boardToPosition.color = boardFromPosition.color;
-    boardFromPosition.piece = null;
-    boardFromPosition.color = null;
+    replacePieceValues(this.state.board[toPositionIndexes[0]][toPositionIndexes[1]], this.state.board[fromPositionIndexes[0]][fromPositionIndexes[1]], ["piece", "color", "moved"]);
+    Object.assign(this.state.board[fromPositionIndexes[0]][fromPositionIndexes[1]], { piece: null, color: null, moved: undefined });
+
+    if (this.state.board[toPositionIndexes[0]][toPositionIndexes[1]].piece === "king") {
+      if (fromPositionIndexes[1] - toPositionIndexes[1] == 2) {
+        replacePieceValues(this.state.board[fromPositionIndexes[0]][toPositionIndexes[1] + 1], this.state.board[fromPositionIndexes[0]][0], ["piece", "color", "moved"]);
+        Object.assign(this.state.board[fromPositionIndexes[0]][0], { piece: null, color: null, moved: undefined });
+      }
+    }
 
     // Checks if move puts other king in check
     const kingPosition = isKingInCheck(this.state.board);
@@ -117,12 +131,14 @@ export default class ChessBoard extends Component<Props, State> {
         if (a % 2 === 0) {
           return <ChessSquare key={`${a}${b}`} row={a} col={b} color={b % 2 === 0 ? "white" : "black"} stats={item} check={this.state.check} turn={this.state.turn}
             pvc={this.props.pvc} board={this.state.board} winner={this.state.winner} setComputerMoving={this.setComputerMoving} computerMoving={this.state.computerMoving}
-            flipBoard={this.flipBoard} setBoard={this.setBoard} setTurn={this.setTurn} setCheck={this.setCheck} setWinner={this.setWinner} computerMove={this.computerMove} />;
+            flipBoard={this.flipBoard} setBoard={this.setBoard} setTurn={this.setTurn} setCheck={this.setCheck} setWinner={this.setWinner} computerMove={this.computerMove}
+            incrementMoveNum={this.incrementMoveNum} moveNum={this.state.moveNum} />;
         }
         else {
           return <ChessSquare key={`${a}${b}`} row={a} col={b} color={b % 2 === 0 ? "black" : "white"} stats={item} check={this.state.check} turn={this.state.turn}
             pvc={this.props.pvc} board={this.state.board} winner={this.state.winner} setComputerMoving={this.setComputerMoving} computerMoving={this.state.computerMoving}
-            flipBoard={this.flipBoard} setBoard={this.setBoard} setTurn={this.setTurn} setCheck={this.setCheck} setWinner={this.setWinner} computerMove={this.computerMove} />;
+            flipBoard={this.flipBoard} setBoard={this.setBoard} setTurn={this.setTurn} setCheck={this.setCheck} setWinner={this.setWinner} computerMove={this.computerMove}
+            incrementMoveNum={this.incrementMoveNum} moveNum={this.state.moveNum} />;
         }
       });
 

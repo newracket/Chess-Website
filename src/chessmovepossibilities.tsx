@@ -1,11 +1,11 @@
-import { Board, PieceColor, PieceType } from "./Types";
+import { Board, PieceColor, PieceStats, PieceType } from "./Types";
 
 interface RowCol {
   row: number,
   col: number
 }
 
-export function findMoves(board: Board, piece: PieceType, color: PieceColor, row: number, col: number): RowCol[] {
+export function findMoves(board: Board, piece: PieceType, color: PieceColor, row: number, col: number, moveNum?: number): RowCol[] {
   // All valid moves for selected piece
   const moves: RowCol[] = [];
 
@@ -33,6 +33,15 @@ export function findMoves(board: Board, piece: PieceType, color: PieceColor, row
     // Capture diagnol right
     if (row - 1 >= 0 && col + 1 <= 7 && board[row - 1][col + 1].piece) {
       addPossibility(board, moves, color, { row: row - 1, col: col + 1 });
+    }
+
+    if (moveNum !== undefined) {
+      [-1, 1].forEach(relativePosition => {
+        const enPassantPawn = board[row][col + relativePosition];
+        if (enPassantPawn !== undefined && enPassantPawn.piece === "pawn" && enPassantPawn.moved === moveNum && enPassantPawn.color !== color) {
+          addPossibility(board, moves, color, { row: row - 1, col: col + relativePosition });
+        }
+      });
     }
   }
 
@@ -82,6 +91,28 @@ export function findMoves(board: Board, piece: PieceType, color: PieceColor, row
       [[+1, 0]],
       [[+1, +1]]
     ]);
+
+    if (color === "white" && row === 7 && col === 4 && !board[row][col].moved) {
+      if (isSquareOpenToCastle(board, "white", row, col + 1) && isSquareOpenToCastle(board, "white", row, col + 2)
+        && board[row][col + 3].piece === "rook" && !board[row][col + 3].moved) {
+        tilesWithPossibleMoves.push([[0, +2]]);
+      }
+
+      if (isSquareOpenToCastle(board, "white", row, col - 1) && isSquareOpenToCastle(board, "white", row, col - 2) && isSquareOpenToCastle(board, "white", row, col - 3)
+        && board[row][col - 4].piece === "rook" && !board[row][col - 4].moved) {
+        tilesWithPossibleMoves.push([[0, -2]]);
+      }
+    } else if (color === "black" && row === 7 && col === 3 && !board[row][col].moved) {
+      if (isSquareOpenToCastle(board, "black", row, col - 1) && isSquareOpenToCastle(board, "black", row, col - 2)
+        && board[row][col - 3].piece === "rook" && !board[row][col - 3].moved) {
+        tilesWithPossibleMoves.push([[0, -2]]);
+      }
+
+      if (isSquareOpenToCastle(board, "black", row, col + 1) && isSquareOpenToCastle(board, "black", row, col + 2) && isSquareOpenToCastle(board, "black", row, col + 3)
+        && board[row][col + 4].piece === "rook" && !board[row][col + 4].moved) {
+        tilesWithPossibleMoves.push([[0, +2]]);
+      }
+    }
   }
 
   // Loops through each movement path (diaganol towards top left, straight up, etc)
@@ -106,6 +137,17 @@ export function findMoves(board: Board, piece: PieceType, color: PieceColor, row
   return moves;
 }
 
+export function isSquareOpenToCastle(board: Board, color: PieceColor, row: number, col: number): boolean {
+  if (board[row][col].piece) return true;
+
+  const newBoard: Board = JSON.parse(JSON.stringify(board));
+  newBoard[row][col].piece = "king";
+  newBoard[row][col].color = color;
+
+  const kingPosition = isKingInCheck(newBoard);
+  return !kingPosition;
+}
+
 export function isKingInCheck(board: Board): RowCol | false {
   let kingPosition: RowCol | undefined;
 
@@ -127,28 +169,54 @@ export function isKingInCheck(board: Board): RowCol | false {
   return kingPosition !== undefined ? kingPosition : false;
 }
 
+// export function checkForCheckmate(board: Board, color: PieceColor): boolean {
+//   const col = board.map(row => row.findIndex(col => col.piece === "king" && col.color === color)).filter(i => i !== -1)[0];
+//   const row = board.findIndex(row => row[col].piece === "king" && row[col].color === color);
+//   const piece = board[row][col];
+
+//   const kingMoves = findMoves(board, piece.piece, piece.color, row, col).filter(possibleMove => {
+//     console.log(possibleMove);
+//     const testBoard: Board = JSON.parse(JSON.stringify(board));
+
+//     testBoard[possibleMove.row][possibleMove.col].piece = piece.piece;
+//     testBoard[possibleMove.row][possibleMove.col].color = piece.color;
+
+//     testBoard[row][col].piece = null;
+//     testBoard[row][col].color = null;
+
+//     const flippedBoard = testBoard.map(row => row.reverse()).reverse();
+//     return !isKingInCheck(flippedBoard);
+//   });
+
+//   return piece.check && kingMoves.length === 0;
+// }
+
 export function checkForCheckmate(board: Board, color: PieceColor): boolean {
-  const col = board.map(row => row.findIndex(col => col.piece === "king" && col.color === color)).filter(i => i !== -1)[0];
-  const row = board.findIndex(row => row[col].piece === "king" && row[col].color === color);
-  const piece = board[row][col];
+  let checkmate = true;
 
-  const kingMoves = findMoves(board, piece.piece, piece.color, row, col).filter(possibleMove => {
-    const testBoard: Board = JSON.parse(JSON.stringify(board));
+  board.forEach((row, rowNum) => {
+    row.forEach((square, colNum) => {
+      if (square.piece && square.color === color) {
+        findMoves(board, square.piece, square.color, rowNum, colNum)
+          .forEach((possibleMove: RowCol) => {
+            const testBoard: Board = JSON.parse(JSON.stringify(board));
 
-    testBoard[possibleMove.row][possibleMove.col].piece = piece.piece;
-    testBoard[possibleMove.row][possibleMove.col].color = piece.color;
+            testBoard[possibleMove.row][possibleMove.col].piece = square.piece;
+            testBoard[possibleMove.row][possibleMove.col].color = square.color;
 
-    testBoard[row][col].piece = null;
-    testBoard[row][col].color = null;
+            testBoard[rowNum][colNum].piece = null;
+            testBoard[rowNum][colNum].color = null;
 
-    const flippedBoard = testBoard.map(row => row.reverse()).reverse();
-    return !isKingInCheck(flippedBoard);
+            const flippedBoard = testBoard.map(row => row.reverse()).reverse();
+            if (!isKingInCheck(flippedBoard)) {
+              checkmate = false;
+            }
+          });
+      }
+    });
   });
 
-  console.log(piece.check);
-  console.log(kingMoves)
-
-  return piece.check && kingMoves.length === 0;
+  return checkmate;
 }
 
 export function addPossibility(board: Board, array: RowCol[], color: PieceColor, rowCol: RowCol): void {
@@ -156,3 +224,7 @@ export function addPossibility(board: Board, array: RowCol[], color: PieceColor,
     array.push(rowCol);
   }
 };
+
+export function replacePieceValues(newPiece: PieceStats, oldPiece: PieceStats, keysToReplace: (keyof PieceStats)[]) {
+  keysToReplace.forEach(k => (newPiece[k] as any) = oldPiece[k]);
+}
