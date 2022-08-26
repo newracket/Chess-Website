@@ -1,4 +1,4 @@
-import { Board, PieceColor, PieceStats, PieceType } from "./Types";
+import { Board, GameType, PieceColor, PieceStats, PieceType } from "./Types";
 
 interface RowCol {
   row: number,
@@ -169,54 +169,36 @@ export function isKingInCheck(board: Board): RowCol | false {
   return kingPosition !== undefined ? kingPosition : false;
 }
 
-// export function checkForCheckmate(board: Board, color: PieceColor): boolean {
-//   const col = board.map(row => row.findIndex(col => col.piece === "king" && col.color === color)).filter(i => i !== -1)[0];
-//   const row = board.findIndex(row => row[col].piece === "king" && row[col].color === color);
-//   const piece = board[row][col];
+export function checkForCheckmate(board: Board, color: PieceColor): GameType {
+  let stalemate = false;
 
-//   const kingMoves = findMoves(board, piece.piece, piece.color, row, col).filter(possibleMove => {
-//     console.log(possibleMove);
-//     const testBoard: Board = JSON.parse(JSON.stringify(board));
 
-//     testBoard[possibleMove.row][possibleMove.col].piece = piece.piece;
-//     testBoard[possibleMove.row][possibleMove.col].color = piece.color;
-
-//     testBoard[row][col].piece = null;
-//     testBoard[row][col].color = null;
-
-//     const flippedBoard = testBoard.map(row => row.reverse()).reverse();
-//     return !isKingInCheck(flippedBoard);
-//   });
-
-//   return piece.check && kingMoves.length === 0;
-// }
-
-export function checkForCheckmate(board: Board, color: PieceColor): boolean {
-  let checkmate = true;
-
-  board.forEach((row, rowNum) => {
-    row.forEach((square, colNum) => {
+  for (const [rowNum, row] of board.entries()) {
+    for (const [colNum, square] of row.entries()) {
       if (square.piece && square.color === color) {
-        findMoves(board, square.piece, square.color, rowNum, colNum)
-          .forEach((possibleMove: RowCol) => {
-            const testBoard: Board = JSON.parse(JSON.stringify(board));
+        for (const possibleMove of findMoves(board, square.piece, square.color, rowNum, colNum)) {
+          const testBoard: Board = JSON.parse(JSON.stringify(board));
 
-            testBoard[possibleMove.row][possibleMove.col].piece = square.piece;
-            testBoard[possibleMove.row][possibleMove.col].color = square.color;
+          testBoard[possibleMove.row][possibleMove.col].piece = square.piece;
+          testBoard[possibleMove.row][possibleMove.col].color = square.color;
 
-            testBoard[rowNum][colNum].piece = null;
-            testBoard[rowNum][colNum].color = null;
+          testBoard[rowNum][colNum].piece = null;
+          testBoard[rowNum][colNum].color = null;
 
-            const flippedBoard = testBoard.map(row => row.reverse()).reverse();
-            if (!isKingInCheck(flippedBoard)) {
-              checkmate = false;
-            }
-          });
+          if (!isKingInCheck(flipBoard(testBoard))) {
+            return GameType.Continue;
+          }
+        };
       }
-    });
-  });
+    };
+  };
 
-  return checkmate;
+  const kingPosition = isKingInCheck(flipBoard(board));
+  if (kingPosition === false) {
+    return GameType.Stalemate;
+  }
+
+  return GameType.Checkmate;
 }
 
 export function addPossibility(board: Board, array: RowCol[], color: PieceColor, rowCol: RowCol): void {
@@ -227,4 +209,9 @@ export function addPossibility(board: Board, array: RowCol[], color: PieceColor,
 
 export function replacePieceValues(newPiece: PieceStats, oldPiece: PieceStats, keysToReplace: (keyof PieceStats)[]) {
   keysToReplace.forEach(k => (newPiece[k] as any) = oldPiece[k]);
+}
+
+export function flipBoard(board: Board): Board {
+  const testBoard: Board = JSON.parse(JSON.stringify(board));
+  return testBoard.map(row => row.reverse()).reverse();
 }

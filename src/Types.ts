@@ -1,5 +1,6 @@
 export type PieceColor = "white" | "black" | null;
-export type PieceType = "pawn" | "knight" | "bishop" | "rook" | "queen" | "king" | null;
+export const PieceTypeValues = ["pawn", "knight", "bishop", "rook", "queen", "king", null] as const;
+export type PieceType = (typeof PieceTypeValues)[number];
 export type PieceStats = {
   color: PieceColor;
   piece: PieceType;
@@ -9,3 +10,8 @@ export type PieceStats = {
   moved: number | undefined;
 }
 export type Board = PieceStats[][];
+export enum GameType {
+  Checkmate,
+  Stalemate,
+  Continue
+}

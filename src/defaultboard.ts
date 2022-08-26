@@ -1,5 +1,217 @@
 import { Board } from "./Types";
 
+// export default [
+//   [
+//     {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: "black",
+//       piece: "king"
+//     }
+//   ], [
+//     {
+//       color: "white",
+//       piece: "rook"
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }
+//   ], [
+//     {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }
+//   ], [
+//     {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }
+//   ], [
+//     {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }
+//   ], [
+//     {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }
+//   ], [
+//     {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }
+//   ], [
+//     {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: null,
+//       piece: null
+//     }, {
+//       color: "white",
+//       piece: "king"
+//     }, {
+//       color: "white",
+//       piece: "rook"
+//     }, {
+//       color: null,
+//       piece: null
+//     }
+//   ]
+// ] as Board
+
 export default [
   [
     {

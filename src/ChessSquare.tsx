@@ -1,6 +1,6 @@
 import { Component } from "react";
-import { checkForCheckmate, findMoves, isKingInCheck, replacePieceValues } from "./chessmovepossibilities";
-import { Board, PieceColor, PieceStats } from './Types';
+import { checkForCheckmate, findMoves, flipBoard, isKingInCheck, replacePieceValues } from "./chessmovepossibilities";
+import { Board, GameType, PieceColor, PieceStats, PieceType, PieceTypeValues } from './Types';
 import ChessPiece from "./ChessPiece";
 
 interface Props {
@@ -10,6 +10,7 @@ interface Props {
   turn: PieceColor;
   board: Board;
   winner: PieceColor;
+  stalemate: boolean;
   computerMoving: boolean;
   row: number;
   col: number;
@@ -27,7 +28,7 @@ interface Props {
 
 export default class ChessSquare extends Component<Props> {
   handleClick() {
-    if (this.props.computerMoving || this.props.winner) return;
+    if (this.props.computerMoving || this.props.winner || this.props.stalemate) return;
 
     const newSquareItem = this.props.stats;
 
@@ -63,9 +64,8 @@ export default class ChessSquare extends Component<Props> {
       testBoard[this.props.row][this.props.col].piece = null;
       testBoard[this.props.row][this.props.col].color = null;
 
-      const flippedBoard = testBoard.map(row => row.reverse()).reverse();
       // Checks if king is in check after move is made
-      if (!isKingInCheck(flippedBoard)) {
+      if (!isKingInCheck(flipBoard(testBoard))) {
         newBoard[possibleMove.row][possibleMove.col].movable = true;
       }
     });
@@ -93,7 +93,7 @@ export default class ChessSquare extends Component<Props> {
         testBoard[this.props.row][this.props.col].piece = null;
         testBoard[this.props.row][this.props.col].color = null;
 
-        const flippedBoard = testBoard.map(row => row.reverse()).reverse();
+        const flippedBoard = flipBoard(testBoard);
         const kingPosition = isKingInCheck(flippedBoard);
         if (!kingPosition || flippedBoard[kingPosition.row][kingPosition.col].color !== this.props.stats.color) {
           newBoard[possibleMove.row][possibleMove.col].movable = true;
@@ -112,6 +112,7 @@ export default class ChessSquare extends Component<Props> {
     const boardSelected = newBoard.map(row => row.map(item => item.selected));
     const selectedRow = boardSelected.map(row => row.filter(item => item)).findIndex(row => row.length > 0);
     const selectedCol = newBoard.map(row => row.findIndex(item => item.selected)).find(item => item !== -1);
+    let promotion = false;
 
     if (selectedRow === -1 || selectedCol === undefined) return;
     const pieceToMove = newBoard[selectedRow][selectedCol];
@@ -133,8 +134,20 @@ export default class ChessSquare extends Component<Props> {
       }
     }
 
-    if (pieceToMove.piece === "pawn" && newSquareItem.piece === null && selectedCol !== this.props.col) {
-      Object.assign(newBoard[this.props.row + 1][this.props.col], { piece: null, color: null, moved: undefined });
+    if (pieceToMove.piece === "pawn") {
+      if (newSquareItem.piece === null && selectedCol !== this.props.col) {
+        Object.assign(newBoard[this.props.row + 1][this.props.col], { piece: null, color: null, moved: undefined });
+      }
+
+      if (this.props.row === 0) {
+        let pieceToConvertTo = prompt("What piece do you want to promote the pawn to?");
+        while (pieceToConvertTo === null || !PieceTypeValues.includes(pieceToConvertTo.toLowerCase() as PieceType)) {
+          pieceToConvertTo = prompt("What piece do you want to promote the pawn to? Options are: queen, rook, knight, bishop");
+        }
+
+        pieceToMove.piece = pieceToConvertTo.toLowerCase() as PieceType;
+        promotion = true;
+      }
     }
 
     // Moves piece
@@ -150,28 +163,25 @@ export default class ChessSquare extends Component<Props> {
       this.props.setCheck(newBoard[kingPosition.row][kingPosition.col].color);
     }
     // Checks if king is currently in check and move removes king from check
-    else if (this.props.check) {
+    else {
       newBoard.map(row => row.map(item => item.check = false));
       this.props.setCheck(null);
     }
 
     this.props.setBoard(newBoard);
 
-    const testBoard: Board = JSON.parse(JSON.stringify(newBoard));
-    const flippedBoard = testBoard.map(row => row.reverse()).reverse();
-    if (checkForCheckmate(flippedBoard, newSquareItem.color === "white" ? "black" : "white")) {
-      return this.props.setWinner(newSquareItem.color);
+    const result = checkForCheckmate(flipBoard(newBoard), newSquareItem.color === "white" ? "black" : "white");
+    if (result !== GameType.Continue) {
+      return this.props.setWinner(newSquareItem.color, result);
     }
 
     if (this.props.pvc) {
       this.props.setComputerMoving(true);
-      setTimeout(() => this.props.computerMove([selectedCol, 8 - selectedRow], [this.props.col, 8 - this.props.row]), 1);
+      setTimeout(() => this.props.computerMove([selectedCol, 8 - selectedRow], [this.props.col, 8 - this.props.row], this.props.stats.piece, promotion), 1);
     } else {
       this.props.flipBoard();
       this.props.setTurn(this.props.turn === "white" ? "black" : "white");
     }
-
-
   }
 
   deselectAll(board: Board) {

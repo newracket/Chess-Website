@@ -1,9 +1,9 @@
 import { Component } from 'react';
 import defaultBoard from './defaultboard';
-import { Board, PieceColor } from './Types';
+import { Board, GameType, PieceColor, PieceType } from './Types';
 import ChessSquare from './ChessSquare';
 import "./ChessBoard.css";
-import { checkForCheckmate, isKingInCheck, replacePieceValues } from './chessmovepossibilities';
+import { checkForCheckmate, flipBoard, isKingInCheck, replacePieceValues } from './chessmovepossibilities';
 
 interface Props {
   pvc: boolean;
@@ -15,6 +15,7 @@ interface State {
   turn: PieceColor;
   check: PieceColor;
   winner: PieceColor;
+  stalemate: boolean;
   computerMoving: boolean;
   moveNum: number;
 }
@@ -23,7 +24,7 @@ export default class ChessBoard extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = { board: defaultBoard, turn: "white", check: null, winner: null, computerMoving: false, moveNum: 0 };
+    this.state = { board: defaultBoard, turn: "white", check: null, winner: null, stalemate: false, computerMoving: false, moveNum: 0 };
     this.setBoard = this.setBoard.bind(this);
     this.setTurn = this.setTurn.bind(this);
     this.flipBoard = this.flipBoard.bind(this);
@@ -68,10 +69,24 @@ export default class ChessBoard extends Component<Props, State> {
     });
   }
 
-  computerMove(playerMoveFrom: number[], playerMoveTo: number[]) {
+  computerMove(playerMoveFrom: number[], playerMoveTo: number[], piece: PieceType, promotion: boolean) {
     const letters = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
     this.props.game.move(`${letters[playerMoveFrom[0]]}${playerMoveFrom[1]}`, `${letters[playerMoveTo[0]]}${playerMoveTo[1]}`);
+
+    if (promotion && piece !== null) {
+      let character = piece?.charAt(0);
+      if (piece === "knight") {
+        character = "n";
+      }
+
+      if (this.state.turn === "white") {
+        this.props.game.setPiece(`${letters[playerMoveTo[0]]}${playerMoveTo[1]}`, character.toUpperCase());
+      } else {
+        this.props.game.setPiece(`${letters[playerMoveTo[0]]}${playerMoveTo[1]}`, character);
+      }
+    }
+
     const computerMove = this.props.game.aiMove(2);
     console.log(computerMove);
     const fromPosition = Object.keys(computerMove)[0];
@@ -84,16 +99,26 @@ export default class ChessBoard extends Component<Props, State> {
     Object.assign(this.state.board[fromPositionIndexes[0]][fromPositionIndexes[1]], { piece: null, color: null, moved: undefined });
 
     if (this.state.board[toPositionIndexes[0]][toPositionIndexes[1]].piece === "king") {
-      if (fromPositionIndexes[1] - toPositionIndexes[1] == 2) {
+      if (fromPositionIndexes[1] - toPositionIndexes[1] === 2) {
         replacePieceValues(this.state.board[fromPositionIndexes[0]][toPositionIndexes[1] + 1], this.state.board[fromPositionIndexes[0]][0], ["piece", "color", "moved"]);
         Object.assign(this.state.board[fromPositionIndexes[0]][0], { piece: null, color: null, moved: undefined });
       }
+      else if (toPositionIndexes[1] - fromPositionIndexes[1] === 2) {
+        replacePieceValues(this.state.board[fromPositionIndexes[0]][toPositionIndexes[1] - 1], this.state.board[fromPositionIndexes[0]][7], ["piece", "color", "moved"]);
+        Object.assign(this.state.board[fromPositionIndexes[0]][7], { piece: null, color: null, moved: undefined });
+      }
+    }
+
+    if (toPositionIndexes[0] === 7 && this.state.board[toPositionIndexes[0]][toPositionIndexes[1]].piece === "pawn") {
+      this.state.board[toPositionIndexes[0]][toPositionIndexes[1]].piece = "queen";
     }
 
     // Checks if move puts other king in check
-    const kingPosition = isKingInCheck(this.state.board);
+    const flippedBoard = flipBoard(this.state.board);
+    const kingPosition = isKingInCheck(flippedBoard);
+    console.log(kingPosition);
     if (kingPosition) {
-      this.state.board[kingPosition.row][kingPosition.col].check = true;
+      this.state.board[7 - kingPosition.row][7 - kingPosition.col].check = true;
       this.setCheck(this.state.board[kingPosition.row][kingPosition.col].color);
     }
     // Checks if king is currently in check and move removes king from check
@@ -102,8 +127,9 @@ export default class ChessBoard extends Component<Props, State> {
       this.setCheck(null);
     }
 
-    if (checkForCheckmate(this.state.board, this.state.turn)) {
-      this.setWinner(this.state.turn === "white" ? "black" : "white");
+    const result = checkForCheckmate(this.state.board, this.state.turn);
+    if (result !== GameType.Continue) {
+      this.setWinner(this.state.turn === "white" ? "black" : "white", result);
     }
 
     this.setBoard(this.state.board);
@@ -117,10 +143,16 @@ export default class ChessBoard extends Component<Props, State> {
     });
   }
 
-  setWinner(winner: PieceColor) {
-    this.setState({
-      winner: winner
-    });
+  setWinner(winner: PieceColor, gameType: GameType) {
+    if (gameType === GameType.Checkmate) {
+      this.setState({
+        winner: winner
+      });
+    } else if (gameType === GameType.Stalemate) {
+      this.setState({
+        stalemate: true
+      });
+    }
   }
 
   constructBoard(boardTemplate: Board) {
@@ -130,15 +162,15 @@ export default class ChessBoard extends Component<Props, State> {
       const newRow = row.map((item, b) => {
         if (a % 2 === 0) {
           return <ChessSquare key={`${a}${b}`} row={a} col={b} color={b % 2 === 0 ? "white" : "black"} stats={item} check={this.state.check} turn={this.state.turn}
-            pvc={this.props.pvc} board={this.state.board} winner={this.state.winner} setComputerMoving={this.setComputerMoving} computerMoving={this.state.computerMoving}
-            flipBoard={this.flipBoard} setBoard={this.setBoard} setTurn={this.setTurn} setCheck={this.setCheck} setWinner={this.setWinner} computerMove={this.computerMove}
-            incrementMoveNum={this.incrementMoveNum} moveNum={this.state.moveNum} />;
+            pvc={this.props.pvc} board={this.state.board} winner={this.state.winner} stalemate={this.state.stalemate} setComputerMoving={this.setComputerMoving}
+            computerMoving={this.state.computerMoving} flipBoard={this.flipBoard} setBoard={this.setBoard} setTurn={this.setTurn} setCheck={this.setCheck} setWinner={this.setWinner}
+            computerMove={this.computerMove} incrementMoveNum={this.incrementMoveNum} moveNum={this.state.moveNum} />;
         }
         else {
           return <ChessSquare key={`${a}${b}`} row={a} col={b} color={b % 2 === 0 ? "black" : "white"} stats={item} check={this.state.check} turn={this.state.turn}
-            pvc={this.props.pvc} board={this.state.board} winner={this.state.winner} setComputerMoving={this.setComputerMoving} computerMoving={this.state.computerMoving}
-            flipBoard={this.flipBoard} setBoard={this.setBoard} setTurn={this.setTurn} setCheck={this.setCheck} setWinner={this.setWinner} computerMove={this.computerMove}
-            incrementMoveNum={this.incrementMoveNum} moveNum={this.state.moveNum} />;
+            pvc={this.props.pvc} board={this.state.board} winner={this.state.winner} stalemate={this.state.stalemate} setComputerMoving={this.setComputerMoving}
+            computerMoving={this.state.computerMoving} flipBoard={this.flipBoard} setBoard={this.setBoard} setTurn={this.setTurn} setCheck={this.setCheck} setWinner={this.setWinner}
+            computerMove={this.computerMove} incrementMoveNum={this.incrementMoveNum} moveNum={this.state.moveNum} />;
         }
       });
 
@@ -153,9 +185,11 @@ export default class ChessBoard extends Component<Props, State> {
       <>
         <div className="titleDiv">
           <h1 className="chessBoardTitle">{
-            this.state.winner
-              ? `${this.state.winner.charAt(0).toUpperCase() + this.state.winner.slice(1)} wins!`
-              : `Player vs. ${this.props.pvc ? "Computer" : "Player"}`
+            this.state.stalemate
+              ? `Stalemate! Nobody wins.`
+              : this.state.winner
+                ? `${this.state.winner.charAt(0).toUpperCase() + this.state.winner.slice(1)} wins!`
+                : `Player vs. ${this.props.pvc ? "Computer" : "Player"}`
           }</h1>
         </div>
 
