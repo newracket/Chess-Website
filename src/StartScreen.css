@@ -1,39 +1,39 @@
 .col {
-    height: 100%;
-    width: 30%;
+  height: 100%;
+  width: 30%;
 }
 
 #mainBox {
-    height: 100%;
-    width: 40%;
-    display: inline-block;
+  height: 100%;
+  width: 40%;
+  display: inline-block;
 
-    background-color: var(--darkgray);
-    padding: 10vh 60px;
-    box-sizing: border-box;
+  background-color: var(--darkgray);
+  padding: 10vh 60px;
+  box-sizing: border-box;
 }
 
 .title {
-    color: white;
-    font-size: 80px;
+  color: white;
+  font-size: 80px;
 }
 
 .btn {
-    font-family: inherit;
-    font-size: 60px;
-    
-    background-color: var(--lightgray);
-    background-image: radial-gradient(var(--lightgray), var(--darkgray));
-    color: white;
-    
-    padding: 25px;
-    margin: 0px 0 60px 0;
-    width: 100%;
-    
-    border: 5px solid rgb(196, 196, 196);
-    z-index: 100;
+  font-family: inherit;
+  font-size: 60px;
+
+  background-color: var(--lightgray);
+  background-image: radial-gradient(var(--lightgray), var(--darkgray));
+  color: white;
+
+  padding: 25px;
+  margin: 0px 0 60px 0;
+  width: 100%;
+
+  border: 5px solid rgb(196, 196, 196);
+  z-index: 100;
 }
 
 .btn:hover {
-    cursor: pointer;
+  cursor: pointer;
 }

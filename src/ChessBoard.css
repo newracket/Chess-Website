@@ -1,95 +1,151 @@
 .container {
-    height: 100vh;
-    width: 100vw;
-    position: absolute;
-    top: 0;
-    left: 0;
+  height: 100vh;
+  width: 100vw;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .titleDiv {
-    height: 15vh;
-    
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  height: 15vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .chessBoardTitle {
-    color: white;
-    font-size: 8vh;
-    margin: 0;
+  color: white;
+  font-size: 8vh;
+  margin: 0 auto;
 }
 
 .chessBoardContainer {
-    height: 85vh;
+  height: 85vh;
 }
 
 .chessBoardTable {
-    border: 3px solid rgb(0, 0, 0);
-    border-spacing: 0px;
-    display: inline-block;
-    position: relative;
+  border: 3px solid rgb(0, 0, 0);
+  border-spacing: 0px;
+  display: inline-block;
+  position: relative;
+  user-select: none;
 }
 
 .white,
 .black {
-    width: 10vmin;
-    height: 10vmin;
-    padding: 0px;
+  width: 10vmin;
+  height: 10vmin;
+  padding: 0px;
+
+  position: relative;
 }
 
 .white {
-    background-color: white;
+  background-color: white;
 }
 
 .black {
-    background-color: rgb(1, 166, 172);
+  background-color: rgb(1, 166, 172);
+  color: white;
+}
+
+.chessSquare {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .chessPiece {
-    cursor: pointer;
-    width: 90%;
-    height: 90%;
-    -webkit-user-drag: none;
-    user-select: none;
+  cursor: pointer;
+  width: 90%;
+  height: 90%;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .dot {
-    height: 3vmin;
-    width: 3vmin;
-    background-color: #bbb;
-    border-radius: 50%;
-    display: inline-block;
+  height: 3vmin;
+  width: 3vmin;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
 }
 
 .movable {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .corners {
-    background-color: #bbb !important;
+  background-color: #bbb !important;
 }
 
 .check {
-    background-color: red !important;
+  background-color: red !important;
 }
 
 .checkmate {
-    background-color: rgb(132, 0, 255) !important;
+  background-color: rgb(132, 0, 255) !important;
 }
 
 .selected {
-    background-color: rgb(40, 134, 40) !important;
+  background-color: rgb(40, 134, 40) !important;
 }
 
 .winnerDisplay {
-    position: absolute;
-    background-color: white;
-    height: 40vh;
-    width: 60vmin;
-    margin: auto;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+  position: absolute;
+  background-color: white;
+  height: 40vh;
+  width: 60vmin;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.back {
+  position: absolute;
+  left: 5%;
+
+  font-size: 40px;
+  border: 5px solid var(--darkgray);
+  border-radius: 5rem;
+  padding: 5px 15px 5px 15px;
+  cursor: pointer;
+
+  background-color: var(--lightgray);
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+
+  display: flex;
+  align-items: center;
+}
+
+.backText {
+  margin-left: 10px;
+}
+
+.lettering {
+  position: absolute;
+  bottom: 2px;
+  left: 5px;
+
+  font-size: 1vw;
+}
+
+.numbering {
+  position: absolute;
+  top: 2px;
+  right: 5px;
+
+  font-size: 1vw;
 }

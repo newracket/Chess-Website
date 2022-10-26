@@ -216,210 +216,273 @@ export default [
   [
     {
       color: "black",
-      piece: "rook"
-    }, {
-      color: "black",
-      piece: "knight"
-    }, {
-      color: "black",
-      piece: "bishop"
-    }, {
-      color: "black",
-      piece: "queen"
-    }, {
-      color: "black",
-      piece: "king"
-    }, {
-      color: "black",
-      piece: "bishop"
-    }, {
-      color: "black",
-      piece: "knight"
-    }, {
-      color: "black",
-      piece: "rook"
-    }
-  ], [
+      piece: "rook",
+    },
     {
       color: "black",
-      piece: "pawn"
-    }, {
+      piece: "knight",
+    },
+    {
       color: "black",
-      piece: "pawn"
-    }, {
+      piece: "bishop",
+    },
+    {
       color: "black",
-      piece: "pawn"
-    }, {
+      piece: "queen",
+    },
+    {
       color: "black",
-      piece: "pawn"
-    }, {
+      piece: "king",
+    },
+    {
       color: "black",
-      piece: "pawn"
-    }, {
+      piece: "bishop",
+    },
+    {
       color: "black",
-      piece: "pawn"
-    }, {
+      piece: "knight",
+    },
+    {
       color: "black",
-      piece: "pawn"
-    }, {
+      piece: "rook",
+    },
+  ],
+  [
+    {
       color: "black",
-      piece: "pawn"
-    }
-  ], [
+      piece: "pawn",
+    },
+    {
+      color: "black",
+      piece: "pawn",
+    },
+    {
+      color: "black",
+      piece: "pawn",
+    },
+    {
+      color: "black",
+      piece: "pawn",
+    },
+    {
+      color: "black",
+      piece: "pawn",
+    },
+    {
+      color: "black",
+      piece: "pawn",
+    },
+    {
+      color: "black",
+      piece: "pawn",
+    },
+    {
+      color: "black",
+      piece: "pawn",
+    },
+  ],
+  [
     {
       color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }
-  ], [
+      piece: null,
+    },
     {
       color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }
-  ], [
+      piece: null,
+    },
     {
       color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }, {
-      color: null,
-      piece: null
-    }
-  ], [
+      piece: null,
+    },
     {
       color: null,
-      piece: null
-    }, {
+      piece: null,
+    },
+    {
       color: null,
-      piece: null
-    }, {
+      piece: null,
+    },
+    {
       color: null,
-      piece: null
-    }, {
+      piece: null,
+    },
+    {
       color: null,
-      piece: null
-    }, {
+      piece: null,
+    },
+    {
       color: null,
-      piece: null
-    }, {
+      piece: null,
+    },
+  ],
+  [
+    {
       color: null,
-      piece: null
-    }, {
+      piece: null,
+    },
+    {
       color: null,
-      piece: null
-    }, {
+      piece: null,
+    },
+    {
       color: null,
-      piece: null
-    }
-  ], [
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+  ],
+  [
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+  ],
+  [
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+    {
+      color: null,
+      piece: null,
+    },
+  ],
+  [
     {
       color: "white",
-      piece: "pawn"
-    }, {
-      color: "white",
-      piece: "pawn"
-    }, {
-      color: "white",
-      piece: "pawn"
-    }, {
-      color: "white",
-      piece: "pawn"
-    }, {
-      color: "white",
-      piece: "pawn"
-    }, {
-      color: "white",
-      piece: "pawn"
-    }, {
-      color: "white",
-      piece: "pawn"
-    }, {
-      color: "white",
-      piece: "pawn"
-    }
-  ], [
+      piece: "pawn",
+    },
     {
       color: "white",
-      piece: "rook"
-    }, {
+      piece: "pawn",
+    },
+    {
       color: "white",
-      piece: "knight"
-    }, {
+      piece: "pawn",
+    },
+    {
       color: "white",
-      piece: "bishop"
-    }, {
+      piece: "pawn",
+    },
+    {
       color: "white",
-      piece: "queen"
-    }, {
+      piece: "pawn",
+    },
+    {
       color: "white",
-      piece: "king"
-    }, {
+      piece: "pawn",
+    },
+    {
       color: "white",
-      piece: "bishop"
-    }, {
+      piece: "pawn",
+    },
+    {
       color: "white",
-      piece: "knight"
-    }, {
+      piece: "pawn",
+    },
+  ],
+  [
+    {
       color: "white",
-      piece: "rook"
-    }
-  ]
-] as Board
+      piece: "rook",
+    },
+    {
+      color: "white",
+      piece: "knight",
+    },
+    {
+      color: "white",
+      piece: "bishop",
+    },
+    {
+      color: "white",
+      piece: "queen",
+    },
+    {
+      color: "white",
+      piece: "king",
+    },
+    {
+      color: "white",
+      piece: "bishop",
+    },
+    {
+      color: "white",
+      piece: "knight",
+    },
+    {
+      color: "white",
+      piece: "rook",
+    },
+  ],
+] as Board;
