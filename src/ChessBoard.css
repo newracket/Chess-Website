@@ -99,11 +99,11 @@
 }
 
 .capturable {
-  background-color: rgb(187, 187, 187);
+  background-color: rgb(187, 187, 187) !important;
 }
 
 .capturable:hover {
-  background-color: rgb(150, 150, 150);
+  background-color: rgb(150, 150, 150) !important;
 }
 
 .check {
