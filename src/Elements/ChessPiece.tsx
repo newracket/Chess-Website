@@ -1,5 +1,11 @@
-import { Component } from "react";
-import { Board, GameStats, PieceColor, PieceStats, SquareStats, StateFunctions } from "../Types";
+import React, { Component } from "react";
+import {
+  Board,
+  GameStats,
+  PieceStats,
+  SquareStats,
+  StateFunctions,
+} from "../Types";
 import { deselectAll, findMoves, flipBoard, isKingInCheck } from "../utils";
 
 interface Props {
@@ -10,8 +16,21 @@ interface Props {
 }
 
 export default class ChessPiece extends Component<Props> {
+  dragStartTime: number;
+
+  constructor(props: Props) {
+    super(props);
+
+    this.dragStartTime = 0;
+  }
+
   handlePieceSelection() {
-    if (this.props.gameStats.winner || this.props.gameStats.stalemate || this.props.gameStats.computerMoving) return;
+    if (
+      this.props.gameStats.winner ||
+      this.props.gameStats.stalemate ||
+      this.props.gameStats.computerMoving
+    )
+      return;
 
     const newSquareItem = this.props.pieceStats;
     const newBoard = this.props.gameStats.board;
@@ -35,16 +54,26 @@ export default class ChessPiece extends Component<Props> {
       ).forEach((possibleMove) => {
         const testBoard: Board = JSON.parse(JSON.stringify(newBoard));
 
-        testBoard[possibleMove.row][possibleMove.col].piece = newSquareItem.piece;
-        testBoard[possibleMove.row][possibleMove.col].color = newSquareItem.color;
+        testBoard[possibleMove.row][possibleMove.col].piece =
+          newSquareItem.piece;
+        testBoard[possibleMove.row][possibleMove.col].color =
+          newSquareItem.color;
 
-        testBoard[this.props.squareStats.row][this.props.squareStats.col].piece = null;
-        testBoard[this.props.squareStats.row][this.props.squareStats.col].color = null;
+        testBoard[this.props.squareStats.row][
+          this.props.squareStats.col
+        ].piece = null;
+        testBoard[this.props.squareStats.row][
+          this.props.squareStats.col
+        ].color = null;
 
         // Checks if move will put player king in check
         const flippedBoard = flipBoard(testBoard);
         const kingPosition = isKingInCheck(flippedBoard);
-        if (!kingPosition || flippedBoard[kingPosition.row][kingPosition.col].color !== this.props.pieceStats.color) {
+        if (
+          !kingPosition ||
+          flippedBoard[kingPosition.row][kingPosition.col].color !==
+            this.props.pieceStats.color
+        ) {
           newBoard[possibleMove.row][possibleMove.col].movable = true;
         }
       });
@@ -53,14 +82,43 @@ export default class ChessPiece extends Component<Props> {
     this.props.stateFunctions.setBoard(newBoard);
   }
 
+  onDragStart(e: React.DragEvent<HTMLImageElement>) {
+    this.dragStartTime = new Date().getTime();
+
+    const img = new Image();
+    img.src = `${this.props.pieceStats.color}${this.props.pieceStats.piece}.png`;
+    e.dataTransfer.setDragImage(img, 40, 40);
+
+    if (!this.props.pieceStats.selected) {
+      this.handlePieceSelection();
+    }
+  }
+
+  onDragEnd() {
+    if (
+      this.props.pieceStats.selected &&
+      new Date().getTime() - this.dragStartTime > 100
+    ) {
+      this.handlePieceSelection();
+    }
+
+    this.dragStartTime = 0;
+  }
+
   render() {
     if (this.props.pieceStats.piece) {
       return (
-        <div className="chessSquare" onClick={() => this.handlePieceSelection()}>
+        <div
+          className="chessSquare"
+          onClick={() => this.handlePieceSelection()}
+        >
           <img
             className="chessPiece"
             src={`${this.props.pieceStats.color}${this.props.pieceStats.piece}.png`}
             alt={`${this.props.pieceStats.color} ${this.props.pieceStats.piece}`}
+            draggable
+            onDragStart={(e) => this.onDragStart(e)}
+            onDragEnd={() => this.onDragEnd()}
           />
         </div>
       );

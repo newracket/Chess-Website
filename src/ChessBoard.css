@@ -20,15 +20,25 @@
   margin: 0 auto;
 }
 
+.chessBoardMoveHistoryContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
 .chessBoardContainer {
-  height: 85vh;
+  padding: 0;
+  margin: 0;
 }
 
 .chessBoardTable {
-  border: 3px solid rgb(0, 0, 0);
-  border-spacing: 0px;
+  border: 2px solid rgb(0, 0, 0, 0.5);
+  border-spacing: 0;
+
   display: inline-block;
   position: relative;
+  vertical-align: top;
+
   user-select: none;
 }
 
@@ -36,7 +46,7 @@
 .black {
   width: 10vmin;
   height: 10vmin;
-  padding: 0px;
+  padding: 0;
 
   position: relative;
 }
@@ -67,36 +77,53 @@
   cursor: pointer;
   width: 90%;
   height: 90%;
-  -webkit-user-drag: none;
+  /* -webkit-user-drag: none; */
   user-select: none;
 }
 
 .dot {
   height: 3vmin;
   width: 3vmin;
-  background-color: #bbb;
+  background-color: rgb(187, 187, 187);
   border-radius: 50%;
   display: inline-block;
+}
+
+.chessSquare:hover .dot,
+.mouseover {
+  background-color: rgb(150, 150, 150);
 }
 
 .movable {
   cursor: pointer;
 }
 
-.corners {
-  background-color: #bbb !important;
+.capturable {
+  background-color: rgb(187, 187, 187);
+}
+
+.capturable:hover {
+  background-color: rgb(150, 150, 150);
 }
 
 .check {
-  background-color: red !important;
+  background-color: red;
 }
 
 .checkmate {
-  background-color: rgb(132, 0, 255) !important;
+  background-color: rgb(132, 0, 255);
 }
 
 .selected {
-  background-color: rgb(40, 134, 40) !important;
+  background-color: rgb(40, 134, 40);
+}
+
+.white.lastMoved {
+  background-color: rgb(222, 210, 25);
+}
+
+.black.lastMoved {
+  background-color: rgb(222, 210, 25, 0.7);
 }
 
 .winnerDisplay {
@@ -148,4 +175,57 @@
   right: 5px;
 
   font-size: 1vw;
+}
+
+.moveHistory {
+  display: inline-block;
+  width: 10vw;
+  margin-left: 30px;
+  border-radius: 0.2rem;
+
+  background-color: rgb(150, 150, 150, 0.5);
+  border: 2px solid var(--lightgray);
+
+  color: white;
+  font-size: 1.5rem;
+}
+
+.moveHistoryTitle {
+  margin: 0;
+  padding: 5px;
+
+  font-size: inherit;
+  font-family: inherit;
+
+  border-bottom: 1px solid black;
+}
+
+.moveRow {
+  border-bottom: 1px solid black;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.moveNum {
+  padding: 20px 10px;
+  display: inline-block;
+
+  border-right: 1px solid black;
+}
+
+.moves {
+  width: 100%;
+  display: inline-block;
+}
+
+.move:first-child {
+  border-right: 1px solid black;
+}
+
+.move {
+  padding: 20px 0;
+  display: inline-block;
+  height: 100%;
 }

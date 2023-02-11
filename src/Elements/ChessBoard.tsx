@@ -1,11 +1,25 @@
 import { Component } from "react";
 import defaultBoard from "../defaultboard";
-import { Board, GameType, PieceColor, PieceType, StateFunctions } from "../Types";
+import {
+  Board,
+  GameType,
+  PieceColor,
+  PieceType,
+  StateFunctions,
+} from "../Types";
 import ChessSquare from "./ChessSquare";
 import "../ChessBoard.css";
-import { checkForCheckmate, flipBoard, isKingInCheck, replacePieceValues } from "../utils";
+import {
+  checkForCheckmate,
+  flipBoard,
+  isKingInCheck,
+  replacePieceValues,
+} from "../utils";
 import { Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 interface Props {
   pvc: boolean;
@@ -20,6 +34,7 @@ interface State {
   stalemate: boolean;
   computerMoving: boolean;
   moveNum: number;
+  moves: string[][];
 }
 
 export default class ChessBoard extends Component<Props, State> {
@@ -36,6 +51,10 @@ export default class ChessBoard extends Component<Props, State> {
       stalemate: false,
       computerMoving: false,
       moveNum: 0,
+      moves: [
+        ["d4", "e5"],
+        ["e4", "d5"],
+      ],
     };
 
     this.setBoard = this.setBoard.bind(this);
@@ -46,6 +65,7 @@ export default class ChessBoard extends Component<Props, State> {
     this.makeComputerMove = this.makeComputerMove.bind(this);
     this.setComputerMoving = this.setComputerMoving.bind(this);
     this.incrementMoveNum = this.incrementMoveNum.bind(this);
+    this.mouseOverSquare = this.mouseOverSquare.bind(this);
 
     this.stateFunctions = {
       setBoard: this.setBoard,
@@ -55,6 +75,7 @@ export default class ChessBoard extends Component<Props, State> {
       setComputerMoving: this.setComputerMoving,
       incrementMoveNum: this.incrementMoveNum,
       flipBoard: this.flipBoard,
+      mouseOverSquare: this.mouseOverSquare,
     };
   }
 
@@ -98,6 +119,8 @@ export default class ChessBoard extends Component<Props, State> {
     this.setState({
       moveNum: this.state.moveNum + 1,
     });
+
+    this.state.moves.push([]);
   }
 
   flipBoard() {
@@ -110,14 +133,30 @@ export default class ChessBoard extends Component<Props, State> {
     return newBoard;
   }
 
-  makeComputerMove(playerMoveFrom: number[], playerMoveTo: number[], piece: PieceType, promotion: boolean) {
+  mouseOverSquare(row: number, col: number) {
+    const newBoard = structuredClone(this.state.board);
+    newBoard.forEach((row) =>
+      row.forEach((square) => (square.mouseover = false))
+    );
+    newBoard[row][col].mouseover = true;
+
+    this.setState({
+      board: newBoard,
+    });
+  }
+
+  makeComputerMove(
+    playerMoveFrom: string,
+    playerMoveTo: string,
+    piece: PieceType,
+    promotion: boolean
+  ) {
     const letters = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
-    this.props.game.move(
-      `${letters[playerMoveFrom[0]]}${playerMoveFrom[1]}`,
-      `${letters[playerMoveTo[0]]}${playerMoveTo[1]}`
-    );
+    // Makes player move in computer's game
+    this.props.game.move(playerMoveFrom, playerMoveTo);
 
+    // Promotes pawn if necessary
     if (promotion && piece !== null) {
       let character = piece?.charAt(0);
       if (piece === "knight") {
@@ -125,9 +164,9 @@ export default class ChessBoard extends Component<Props, State> {
       }
 
       if (this.state.turn === "white") {
-        this.props.game.setPiece(`${letters[playerMoveTo[0]]}${playerMoveTo[1]}`, character.toUpperCase());
+        this.props.game.setPiece(playerMoveTo, character.toUpperCase());
       } else {
-        this.props.game.setPiece(`${letters[playerMoveTo[0]]}${playerMoveTo[1]}`, character);
+        this.props.game.setPiece(playerMoveTo, character);
       }
     }
 
@@ -135,48 +174,59 @@ export default class ChessBoard extends Component<Props, State> {
     const fromPosition = Object.keys(computerMove)[0];
     const toPosition = computerMove[fromPosition];
 
-    const fromPositionIndexes = [8 - parseInt(fromPosition[1]), letters.indexOf(fromPosition[0])];
-    const toPositionIndexes = [8 - parseInt(toPosition[1]), letters.indexOf(toPosition[0])];
+    const fromPositionIndexes = [
+      8 - parseInt(fromPosition[1]),
+      letters.indexOf(fromPosition[0]),
+    ];
+    const toPositionIndexes = [
+      8 - parseInt(toPosition[1]),
+      letters.indexOf(toPosition[0]),
+    ];
 
-    replacePieceValues(
-      this.state.board[toPositionIndexes[0]][toPositionIndexes[1]],
-      this.state.board[fromPositionIndexes[0]][fromPositionIndexes[1]],
-      ["piece", "color", "moved"]
-    );
-    Object.assign(this.state.board[fromPositionIndexes[0]][fromPositionIndexes[1]], {
+    const fromSquare =
+      this.state.board[fromPositionIndexes[0]][fromPositionIndexes[1]];
+    const toSquare =
+      this.state.board[toPositionIndexes[0]][toPositionIndexes[1]];
+    const defaultPieceStats = {
       piece: null,
       color: null,
       moved: undefined,
-    });
+      lastMoved: true,
+    };
 
-    if (this.state.board[toPositionIndexes[0]][toPositionIndexes[1]].piece === "king") {
+    // Clears all lastMoved properties
+    this.state.board.forEach((row) =>
+      row.forEach((item) => (item.lastMoved = false))
+    );
+
+    // Makes computer move
+    replacePieceValues(toSquare, fromSquare, ["piece", "color", "moved"]);
+    Object.assign(fromSquare, defaultPieceStats);
+    toSquare.lastMoved = true;
+
+    // Moves rook when castling
+    if (toSquare.piece === "king") {
+      let colNum = 7;
+      let offset = -1;
       if (fromPositionIndexes[1] - toPositionIndexes[1] === 2) {
-        replacePieceValues(
-          this.state.board[fromPositionIndexes[0]][toPositionIndexes[1] + 1],
-          this.state.board[fromPositionIndexes[0]][0],
-          ["piece", "color", "moved"]
-        );
-        Object.assign(this.state.board[fromPositionIndexes[0]][0], {
-          piece: null,
-          color: null,
-          moved: undefined,
-        });
-      } else if (toPositionIndexes[1] - fromPositionIndexes[1] === 2) {
-        replacePieceValues(
-          this.state.board[fromPositionIndexes[0]][toPositionIndexes[1] - 1],
-          this.state.board[fromPositionIndexes[0]][7],
-          ["piece", "color", "moved"]
-        );
-        Object.assign(this.state.board[fromPositionIndexes[0]][7], {
-          piece: null,
-          color: null,
-          moved: undefined,
-        });
+        colNum = 0;
+        offset = 1;
       }
+
+      replacePieceValues(
+        this.state.board[fromPositionIndexes[0]][toPositionIndexes[1] + offset],
+        this.state.board[fromPositionIndexes[0]][colNum],
+        ["piece", "color", "moved"]
+      );
+      Object.assign(
+        this.state.board[fromPositionIndexes[0]][colNum],
+        defaultPieceStats
+      );
     }
 
-    if (toPositionIndexes[0] === 7 && this.state.board[toPositionIndexes[0]][toPositionIndexes[1]].piece === "pawn") {
-      this.state.board[toPositionIndexes[0]][toPositionIndexes[1]].piece = "queen";
+    // Promoting pawn
+    if (toPositionIndexes[0] === 7 && toSquare.piece === "pawn") {
+      toSquare.piece = "queen";
     }
 
     // Checks if move puts other king in check
@@ -206,34 +256,33 @@ export default class ChessBoard extends Component<Props, State> {
     const board: JSX.Element[] = [];
 
     boardTemplate.forEach((row, a) => {
-      const newRow = row.map((item, b) => {
-        return (
-          <ChessSquare
-            key={`${a}${b}`}
-            squareStats={{
-              row: a,
-              col: b,
-              squareColor: a % 2 === b % 2 ? "white" : "black",
-            }}
-            pieceStats={item}
-            gameStats={{
-              turn: this.state.turn,
-              pvc: this.props.pvc,
-              board: this.state.board,
-              winner: this.state.winner,
-              stalemate: this.state.stalemate,
-              moveNum: this.state.moveNum,
-              computerMoving: this.state.computerMoving,
-            }}
-            stateFunctions={this.stateFunctions}
-            makeComputerMove={this.makeComputerMove}
-          />
-        );
-      });
-
       board.push(
         <tr key={a} className="chessBoardRow">
-          {newRow}
+          {row.map((item, b) => {
+            return (
+              <ChessSquare
+                key={`${a}${b}`}
+                squareStats={{
+                  row: a,
+                  col: b,
+                  squareColor: a % 2 === b % 2 ? "white" : "black",
+                }}
+                pieceStats={item}
+                gameStats={{
+                  turn: this.state.turn,
+                  pvc: this.props.pvc,
+                  board: this.state.board,
+                  winner: this.state.winner,
+                  stalemate: this.state.stalemate,
+                  moveNum: this.state.moveNum,
+                  moves: this.state.moves,
+                  computerMoving: this.state.computerMoving,
+                }}
+                stateFunctions={this.stateFunctions}
+                makeComputerMove={this.makeComputerMove}
+              />
+            );
+          })}
         </tr>
       );
     });
@@ -243,7 +292,7 @@ export default class ChessBoard extends Component<Props, State> {
 
   render() {
     return (
-      <>
+      <DndProvider backend={HTML5Backend}>
         <div className="titleDiv">
           <Link to="/" className="back">
             <FaArrowLeft />
@@ -254,17 +303,37 @@ export default class ChessBoard extends Component<Props, State> {
             {this.state.stalemate
               ? `Stalemate! Nobody wins.`
               : this.state.winner
-              ? `${this.state.winner.charAt(0).toUpperCase() + this.state.winner.slice(1)} wins!`
+              ? `${
+                  this.state.winner.charAt(0).toUpperCase() +
+                  this.state.winner.slice(1)
+                } wins!`
               : `Player vs. ${this.props.pvc ? "Computer" : "Player"}`}
           </h1>
         </div>
 
-        <div className="chessBoardContainer">
-          <table className="chessBoardTable">
-            <tbody className="chessBoardBody">{this.constructBoard(this.state.board)}</tbody>
-          </table>
+        <div className="chessBoardMoveHistoryContainer">
+          <div className="chessBoardContainer">
+            <table className="chessBoardTable">
+              <tbody className="chessBoardBody">
+                {this.constructBoard(this.state.board)}
+              </tbody>
+            </table>
+          </div>
+
+          {/*<table className="moveHistory">*/}
+          {/*  <h1 className="moveHistoryTitle">Move History</h1>*/}
+          {/*  {this.state.moves.map((move, i) => {*/}
+          {/*    return (*/}
+          {/*      <tr className="moveRow">*/}
+          {/*        <td className="moveNum">{i + 1}</td>*/}
+          {/*        <td className="move">{move[0]}</td>*/}
+          {/*        <td className="move">{move[1]}</td>*/}
+          {/*      </tr>*/}
+          {/*    );*/}
+          {/*  })}*/}
+          {/*</table>*/}
         </div>
-      </>
+      </DndProvider>
     );
   }
 }

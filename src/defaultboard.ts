@@ -1,488 +1,84 @@
 import { Board } from "./Types";
 
-// export default [
-//   [
-//     {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: "black",
-//       piece: "king"
-//     }
-//   ], [
-//     {
-//       color: "white",
-//       piece: "rook"
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }
-//   ], [
-//     {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }
-//   ], [
-//     {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }
-//   ], [
-//     {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }
-//   ], [
-//     {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }
-//   ], [
-//     {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }
-//   ], [
-//     {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: null,
-//       piece: null
-//     }, {
-//       color: "white",
-//       piece: "king"
-//     }, {
-//       color: "white",
-//       piece: "rook"
-//     }, {
-//       color: null,
-//       piece: null
-//     }
-//   ]
-// ] as Board
-
 export default [
   [
-    {
-      color: "black",
-      piece: "rook",
-    },
-    {
-      color: "black",
-      piece: "knight",
-    },
-    {
-      color: "black",
-      piece: "bishop",
-    },
-    {
-      color: "black",
-      piece: "queen",
-    },
-    {
-      color: "black",
-      piece: "king",
-    },
-    {
-      color: "black",
-      piece: "bishop",
-    },
-    {
-      color: "black",
-      piece: "knight",
-    },
-    {
-      color: "black",
-      piece: "rook",
-    },
+    { color: "black", piece: "rook", rowNum: 8, colLetter: "a" },
+    { color: "black", piece: "knight", rowNum: 8, colLetter: "b" },
+    { color: "black", piece: "bishop", rowNum: 8, colLetter: "c" },
+    { color: "black", piece: "queen", rowNum: 8, colLetter: "d" },
+    { color: "black", piece: "king", rowNum: 8, colLetter: "e" },
+    { color: "black", piece: "bishop", rowNum: 8, colLetter: "f" },
+    { color: "black", piece: "knight", rowNum: 8, colLetter: "g" },
+    { color: "black", piece: "rook", rowNum: 8, colLetter: "h" },
   ],
   [
-    {
-      color: "black",
-      piece: "pawn",
-    },
-    {
-      color: "black",
-      piece: "pawn",
-    },
-    {
-      color: "black",
-      piece: "pawn",
-    },
-    {
-      color: "black",
-      piece: "pawn",
-    },
-    {
-      color: "black",
-      piece: "pawn",
-    },
-    {
-      color: "black",
-      piece: "pawn",
-    },
-    {
-      color: "black",
-      piece: "pawn",
-    },
-    {
-      color: "black",
-      piece: "pawn",
-    },
+    { color: "black", piece: "pawn", rowNum: 7, colLetter: "a" },
+    { color: "black", piece: "pawn", rowNum: 7, colLetter: "b" },
+    { color: "black", piece: "pawn", rowNum: 7, colLetter: "c" },
+    { color: "black", piece: "pawn", rowNum: 7, colLetter: "d" },
+    { color: "black", piece: "pawn", rowNum: 7, colLetter: "e" },
+    { color: "black", piece: "pawn", rowNum: 7, colLetter: "f" },
+    { color: "black", piece: "pawn", rowNum: 7, colLetter: "g" },
+    { color: "black", piece: "pawn", rowNum: 7, colLetter: "h" },
   ],
   [
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
+    { color: null, piece: null, rowNum: 6, colLetter: "a" },
+    { color: null, piece: null, rowNum: 6, colLetter: "b" },
+    { color: null, piece: null, rowNum: 6, colLetter: "c" },
+    { color: null, piece: null, rowNum: 6, colLetter: "d" },
+    { color: null, piece: null, rowNum: 6, colLetter: "e" },
+    { color: null, piece: null, rowNum: 6, colLetter: "f" },
+    { color: null, piece: null, rowNum: 6, colLetter: "g" },
+    { color: null, piece: null, rowNum: 6, colLetter: "h" },
   ],
   [
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
+    { color: null, piece: null, rowNum: 5, colLetter: "a" },
+    { color: null, piece: null, rowNum: 5, colLetter: "b" },
+    { color: null, piece: null, rowNum: 5, colLetter: "c" },
+    { color: null, piece: null, rowNum: 5, colLetter: "d" },
+    { color: null, piece: null, rowNum: 5, colLetter: "e" },
+    { color: null, piece: null, rowNum: 5, colLetter: "f" },
+    { color: null, piece: null, rowNum: 5, colLetter: "g" },
+    { color: null, piece: null, rowNum: 5, colLetter: "h" },
   ],
   [
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
+    { color: null, piece: null, rowNum: 4, colLetter: "a" },
+    { color: null, piece: null, rowNum: 4, colLetter: "b" },
+    { color: null, piece: null, rowNum: 4, colLetter: "c" },
+    { color: null, piece: null, rowNum: 4, colLetter: "d" },
+    { color: null, piece: null, rowNum: 4, colLetter: "e" },
+    { color: null, piece: null, rowNum: 4, colLetter: "f" },
+    { color: null, piece: null, rowNum: 4, colLetter: "g" },
+    { color: null, piece: null, rowNum: 4, colLetter: "h" },
   ],
   [
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
-    {
-      color: null,
-      piece: null,
-    },
+    { color: null, piece: null, rowNum: 3, colLetter: "a" },
+    { color: null, piece: null, rowNum: 3, colLetter: "b" },
+    { color: null, piece: null, rowNum: 3, colLetter: "c" },
+    { color: null, piece: null, rowNum: 3, colLetter: "d" },
+    { color: null, piece: null, rowNum: 3, colLetter: "e" },
+    { color: null, piece: null, rowNum: 3, colLetter: "f" },
+    { color: null, piece: null, rowNum: 3, colLetter: "g" },
+    { color: null, piece: null, rowNum: 3, colLetter: "h" },
   ],
   [
-    {
-      color: "white",
-      piece: "pawn",
-    },
-    {
-      color: "white",
-      piece: "pawn",
-    },
-    {
-      color: "white",
-      piece: "pawn",
-    },
-    {
-      color: "white",
-      piece: "pawn",
-    },
-    {
-      color: "white",
-      piece: "pawn",
-    },
-    {
-      color: "white",
-      piece: "pawn",
-    },
-    {
-      color: "white",
-      piece: "pawn",
-    },
-    {
-      color: "white",
-      piece: "pawn",
-    },
+    { color: "white", piece: "pawn", rowNum: 2, colLetter: "a" },
+    { color: "white", piece: "pawn", rowNum: 2, colLetter: "b" },
+    { color: "white", piece: "pawn", rowNum: 2, colLetter: "c" },
+    { color: "white", piece: "pawn", rowNum: 2, colLetter: "d" },
+    { color: "white", piece: "pawn", rowNum: 2, colLetter: "e" },
+    { color: "white", piece: "pawn", rowNum: 2, colLetter: "f" },
+    { color: "white", piece: "pawn", rowNum: 2, colLetter: "g" },
+    { color: "white", piece: "pawn", rowNum: 2, colLetter: "h" },
   ],
   [
-    {
-      color: "white",
-      piece: "rook",
-    },
-    {
-      color: "white",
-      piece: "knight",
-    },
-    {
-      color: "white",
-      piece: "bishop",
-    },
-    {
-      color: "white",
-      piece: "queen",
-    },
-    {
-      color: "white",
-      piece: "king",
-    },
-    {
-      color: "white",
-      piece: "bishop",
-    },
-    {
-      color: "white",
-      piece: "knight",
-    },
-    {
-      color: "white",
-      piece: "rook",
-    },
+    { color: "white", piece: "rook", rowNum: 1, colLetter: "a" },
+    { color: "white", piece: "knight", rowNum: 1, colLetter: "b" },
+    { color: "white", piece: "bishop", rowNum: 1, colLetter: "c" },
+    { color: "white", piece: "queen", rowNum: 1, colLetter: "d" },
+    { color: "white", piece: "king", rowNum: 1, colLetter: "e" },
+    { color: "white", piece: "bishop", rowNum: 1, colLetter: "f" },
+    { color: "white", piece: "knight", rowNum: 1, colLetter: "g" },
+    { color: "white", piece: "rook", rowNum: 1, colLetter: "h" },
   ],
 ] as Board;

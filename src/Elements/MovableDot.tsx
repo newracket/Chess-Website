@@ -1,6 +1,22 @@
 import { Component } from "react";
-import { checkForCheckmate, deselectAll, flipBoard, isKingInCheck, replacePieceValues } from "../utils";
-import { GameStats, GameType, PieceStats, PieceType, PieceTypeValues, SquareStats, StateFunctions } from "../Types";
+import {
+  checkForCheckmate,
+  deselectAll,
+  flipBoard,
+  getNotation,
+  isKingInCheck,
+  replacePieceValues,
+} from "../utils";
+import {
+  GameStats,
+  GameType,
+  PieceStats,
+  PieceType,
+  PieceTypeValues,
+  SpecialMoves,
+  SquareStats,
+  StateFunctions,
+} from "../Types";
 
 interface Props {
   pieceStats: PieceStats;
@@ -10,18 +26,52 @@ interface Props {
   makeComputerMove: Function;
 }
 
-export default class ChessPiece extends Component<Props> {
+interface State {
+  mouseover: boolean;
+}
+
+export default class ChessPiece extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = { mouseover: false };
+  }
+
   movePiece() {
-    if (this.props.gameStats.winner || this.props.gameStats.stalemate || this.props.gameStats.computerMoving) return;
+    if (
+      this.props.gameStats.winner ||
+      this.props.gameStats.stalemate ||
+      this.props.gameStats.computerMoving
+    )
+      return;
 
     const newBoard = this.props.gameStats.board;
     const newSquareItem = this.props.pieceStats;
 
     // Finds row and column of selected piece
-    const boardSelected = newBoard.map((row) => row.map((item) => item.selected));
-    const selectedRow = boardSelected.map((row) => row.filter((item) => item)).findIndex((row) => row.length > 0);
-    const selectedCol = newBoard.map((row) => row.findIndex((item) => item.selected)).find((item) => item !== -1);
-    let promotion = false;
+    const boardSelected = newBoard.map((row) =>
+      row.map((item) => item.selected)
+    );
+    const selectedRow = boardSelected
+      .map((row) => row.filter((item) => item))
+      .findIndex((row) => row.length > 0);
+    const selectedCol = newBoard
+      .map((row) => row.findIndex((item) => item.selected))
+      .find((item) => item !== -1);
+    const specialMoves: SpecialMoves = {
+      castle: false,
+      enPassant: false,
+      promotion: false,
+      capture: false,
+      check: false,
+      checkmate: false,
+    };
+    const defaultPieceStats = {
+      piece: null,
+      color: null,
+      moved: undefined,
+      lastMoved: true,
+    };
 
     if (selectedRow === -1 || selectedCol === undefined) return;
     const pieceToMove = newBoard[selectedRow][selectedCol];
@@ -33,61 +83,84 @@ export default class ChessPiece extends Component<Props> {
       this.props.stateFunctions.incrementMoveNum();
     }
 
-    if (pieceToMove.piece === "king") {
-      if (this.props.squareStats.col - selectedCol === 2) {
-        replacePieceValues(
-          newBoard[this.props.squareStats.row][this.props.squareStats.col - 1],
-          newBoard[this.props.squareStats.row][7],
-          ["piece", "color", "moved"]
-        );
-        Object.assign(newBoard[this.props.squareStats.row][7], {
-          piece: null,
-          color: null,
-          moved: undefined,
-        });
-      } else if (this.props.squareStats.col - selectedCol === -2) {
-        replacePieceValues(
-          newBoard[this.props.squareStats.row][this.props.squareStats.col + 1],
-          newBoard[this.props.squareStats.row][0],
-          ["piece", "color", "moved"]
-        );
-        Object.assign(newBoard[this.props.squareStats.row][0], {
-          piece: null,
-          color: null,
-          moved: undefined,
-        });
+    // Moves rook when castling
+    if (
+      pieceToMove.piece === "king" &&
+      Math.abs(this.props.squareStats.col - selectedCol) === 2
+    ) {
+      let colNum = 7;
+      let offset = -1;
+      if (this.props.squareStats.col - selectedCol === -2) {
+        offset = +1;
+        colNum = 0;
       }
+
+      replacePieceValues(
+        newBoard[this.props.squareStats.row][
+          this.props.squareStats.col + offset
+        ],
+        newBoard[this.props.squareStats.row][colNum],
+        ["piece", "color", "moved"]
+      );
+      Object.assign(
+        newBoard[this.props.squareStats.row][colNum],
+        defaultPieceStats
+      );
+
+      specialMoves.castle = true;
     }
 
     if (pieceToMove.piece === "pawn") {
-      if (newSquareItem.piece === null && selectedCol !== this.props.squareStats.col) {
-        Object.assign(newBoard[this.props.squareStats.row + 1][this.props.squareStats.col], {
-          piece: null,
-          color: null,
-          moved: undefined,
-        });
+      // Removes opponent pawn in en passant
+      if (
+        newSquareItem.piece === null &&
+        selectedCol !== this.props.squareStats.col
+      ) {
+        Object.assign(
+          newBoard[this.props.squareStats.row + 1][this.props.squareStats.col],
+          defaultPieceStats
+        );
+
+        specialMoves.enPassant = true;
       }
 
+      // Promoting pawn
       if (this.props.squareStats.row === 0) {
-        let pieceToConvertTo = prompt("What piece do you want to promote the pawn to?");
-        while (pieceToConvertTo === null || !PieceTypeValues.includes(pieceToConvertTo.toLowerCase() as PieceType)) {
+        let pieceToConvertTo = prompt(
+          "What piece do you want to promote the pawn to?"
+        );
+        while (
+          pieceToConvertTo === null ||
+          pieceToConvertTo.toLowerCase() === "king" ||
+          !PieceTypeValues.includes(pieceToConvertTo.toLowerCase() as PieceType)
+        ) {
           pieceToConvertTo = prompt(
             "What piece do you want to promote the pawn to? Options are: queen, rook, knight, bishop"
           );
         }
 
         pieceToMove.piece = pieceToConvertTo.toLowerCase() as PieceType;
-        promotion = true;
+        specialMoves.promotion = true;
       }
     }
 
+    const pieceAfterMove =
+      newBoard[this.props.squareStats.row][this.props.squareStats.col];
+    if (pieceAfterMove.piece !== null) {
+      specialMoves.capture = true;
+    }
+
+    // Clears all lastMoved properties
+    newBoard.forEach((row) => row.forEach((item) => (item.lastMoved = false)));
+
     // Moves piece
-    replacePieceValues(newBoard[this.props.squareStats.row][this.props.squareStats.col], pieceToMove, [
+    replacePieceValues(pieceAfterMove, pieceToMove, [
       "piece",
       "color",
       "moved",
     ]);
-    Object.assign(pieceToMove, { piece: null, color: null, moved: undefined });
+    Object.assign(pieceToMove, defaultPieceStats);
+    pieceAfterMove.lastMoved = true;
 
     deselectAll(newBoard);
 
@@ -95,7 +168,10 @@ export default class ChessPiece extends Component<Props> {
     const kingPosition = isKingInCheck(newBoard);
     if (kingPosition) {
       newBoard[kingPosition.row][kingPosition.col].check = true;
-      this.props.stateFunctions.setCheck(newBoard[kingPosition.row][kingPosition.col].color);
+      this.props.stateFunctions.setCheck(
+        newBoard[kingPosition.row][kingPosition.col].color
+      );
+      specialMoves.check = true;
     }
     // Checks if king is currently in check and move removes king from check
     else {
@@ -105,7 +181,17 @@ export default class ChessPiece extends Component<Props> {
 
     this.props.stateFunctions.setBoard(newBoard);
 
-    const result = checkForCheckmate(flipBoard(newBoard), newSquareItem.color === "white" ? "black" : "white");
+    const result = checkForCheckmate(
+      flipBoard(newBoard),
+      newSquareItem.color === "white" ? "black" : "white"
+    );
+    if (result === GameType.Checkmate) {
+      specialMoves.checkmate = true;
+    }
+
+    this.props.gameStats.moves[this.props.gameStats.moves.length - 1].push(
+      getNotation(newBoard, pieceToMove, pieceAfterMove, specialMoves)
+    );
     if (result !== GameType.Continue) {
       return this.props.stateFunctions.setWinner(newSquareItem.color, result);
     }
@@ -115,23 +201,36 @@ export default class ChessPiece extends Component<Props> {
       setTimeout(
         () =>
           this.props.makeComputerMove(
-            [selectedCol, 8 - selectedRow],
-            [this.props.squareStats.col, 8 - this.props.squareStats.row],
+            `${pieceToMove.colLetter}${pieceToMove.rowNum}`,
+            `${pieceAfterMove.colLetter}${pieceAfterMove.rowNum}`,
             this.props.pieceStats.piece,
-            promotion
+            specialMoves.promotion
           ),
         1
       );
     } else {
       this.props.stateFunctions.flipBoard();
-      this.props.stateFunctions.setTurn(this.props.gameStats.turn === "white" ? "black" : "white");
+      this.props.stateFunctions.setTurn(
+        this.props.gameStats.turn === "white" ? "black" : "white"
+      );
     }
   }
 
   render() {
     return (
-      <div className="chessSquare" onClick={() => this.movePiece()}>
-        {!this.props.pieceStats.piece && <span className="dot"></span>}
+      <div
+        className="chessSquare"
+        onClick={() => this.movePiece()}
+        onDrop={() => this.movePiece()}
+        onDragOver={(e) => e.preventDefault()}
+      >
+        {!this.props.pieceStats.piece && (
+          <span
+            className={`dot${
+              this.props.pieceStats.mouseover ? " mouseover" : ""
+            }`}
+          ></span>
+        )}
       </div>
     );
   }

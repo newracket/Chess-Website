@@ -1,4 +1,11 @@
-import { Board, GameType, PieceColor, PieceStats, PieceType } from "./Types";
+import {
+  Board,
+  GameType,
+  PieceColor,
+  PieceStats,
+  PieceType,
+  SpecialMoves,
+} from "./Types";
 
 interface RowCol {
   row: number;
@@ -63,7 +70,16 @@ export function findMoves(
   if (piece === "knight") {
     // Adds all possible knight moves
     tilesWithPossibleMoves.push(
-      ...[[[-2, -1]], [[-2, +1]], [[+2, -1]], [[+2, +1]], [[-1, -2]], [[-1, +2]], [[+1, -2]], [[+1, +2]]]
+      ...[
+        [[-2, -1]],
+        [[-2, +1]],
+        [[+2, -1]],
+        [[+2, +1]],
+        [[-1, -2]],
+        [[-1, +2]],
+        [[+1, -2]],
+        [[+1, +2]],
+      ]
     );
   }
 
@@ -94,7 +110,16 @@ export function findMoves(
   if (piece === "king") {
     // Adds all possible king moves
     tilesWithPossibleMoves.push(
-      ...[[[-1, -1]], [[-1, 0]], [[-1, +1]], [[0, -1]], [[0, +1]], [[+1, -1]], [[+1, 0]], [[+1, +1]]]
+      ...[
+        [[-1, -1]],
+        [[-1, 0]],
+        [[-1, +1]],
+        [[0, -1]],
+        [[0, +1]],
+        [[+1, -1]],
+        [[+1, 0]],
+        [[+1, +1]],
+      ]
     );
 
     if (color === "white" && row === 7 && col === 4 && !board[row][col].moved) {
@@ -116,7 +141,12 @@ export function findMoves(
       ) {
         tilesWithPossibleMoves.push([[0, -2]]);
       }
-    } else if (color === "black" && row === 7 && col === 3 && !board[row][col].moved) {
+    } else if (
+      color === "black" &&
+      row === 7 &&
+      col === 3 &&
+      !board[row][col].moved
+    ) {
       if (
         isSquareOpenToCastle(board, "black", row, col - 1) &&
         isSquareOpenToCastle(board, "black", row, col - 2) &&
@@ -163,7 +193,12 @@ export function findMoves(
   return moves;
 }
 
-export function isSquareOpenToCastle(board: Board, color: PieceColor, row: number, col: number): boolean {
+export function isSquareOpenToCastle(
+  board: Board,
+  color: PieceColor,
+  row: number,
+  col: number
+): boolean {
   if (board[row][col].piece) return true;
 
   const newBoard: Board = JSON.parse(JSON.stringify(board));
@@ -183,12 +218,14 @@ export function isKingInCheck(board: Board): RowCol | false {
       // Exits if tile doesn't contain a piece
       if (!square.piece) return;
 
-      findMoves(board, square.piece, square.color, a, b).forEach((move: RowCol) => {
-        // Checks if any possible move captures the king
-        if (board[move.row][move.col].piece === "king") {
-          kingPosition = move;
+      findMoves(board, square.piece, square.color, a, b).forEach(
+        (move: RowCol) => {
+          // Checks if any possible move captures the king
+          if (board[move.row][move.col].piece === "king") {
+            kingPosition = move;
+          }
         }
-      });
+      );
     });
   });
 
@@ -199,7 +236,13 @@ export function checkForCheckmate(board: Board, color: PieceColor): GameType {
   for (const [rowNum, row] of board.entries()) {
     for (const [colNum, square] of row.entries()) {
       if (square.piece && square.color === color) {
-        for (const possibleMove of findMoves(board, square.piece, square.color, rowNum, colNum)) {
+        for (const possibleMove of findMoves(
+          board,
+          square.piece,
+          square.color,
+          rowNum,
+          colNum
+        )) {
           const testBoard: Board = JSON.parse(JSON.stringify(board));
 
           testBoard[possibleMove.row][possibleMove.col].piece = square.piece;
@@ -224,13 +267,25 @@ export function checkForCheckmate(board: Board, color: PieceColor): GameType {
   return GameType.Checkmate;
 }
 
-export function addPossibility(board: Board, array: RowCol[], color: PieceColor, rowCol: RowCol): void {
-  if (!board[rowCol.row][rowCol.col].piece || board[rowCol.row][rowCol.col].color !== color) {
+export function addPossibility(
+  board: Board,
+  array: RowCol[],
+  color: PieceColor,
+  rowCol: RowCol
+): void {
+  if (
+    !board[rowCol.row][rowCol.col].piece ||
+    board[rowCol.row][rowCol.col].color !== color
+  ) {
     array.push(rowCol);
   }
 }
 
-export function replacePieceValues(newPiece: PieceStats, oldPiece: PieceStats, keysToReplace: (keyof PieceStats)[]) {
+export function replacePieceValues(
+  newPiece: PieceStats,
+  oldPiece: PieceStats,
+  keysToReplace: (keyof PieceStats)[]
+) {
   keysToReplace.forEach((k) => ((newPiece[k] as any) = oldPiece[k]));
 }
 
@@ -246,4 +301,50 @@ export function deselectAll(board: Board) {
       item.movable = false;
     })
   );
+}
+
+// Check should have + at end of notation
+export function getNotation(
+  board: Board,
+  startPiece: PieceStats,
+  endPiece: PieceStats,
+  specialMoves: SpecialMoves
+) {
+  if (endPiece.piece === null) return "";
+  let notation;
+
+  // Determines notation letter for piece (knight is an edge case)
+  let pieceLetter = endPiece.piece.charAt(0).toUpperCase();
+  if (endPiece.piece === "knight") {
+    pieceLetter = "N";
+  }
+
+  /* Pawn Notation */
+  if (endPiece.piece === "pawn" || specialMoves.promotion) {
+    // Pawn moves in same row
+    if (startPiece.colLetter === endPiece.colLetter) {
+      // Normal pawn move
+      notation = `${endPiece.colLetter}${endPiece.rowNum}`;
+    } else {
+      // Pawn captures diagonally
+      notation = `${startPiece.colLetter}x${endPiece.colLetter}${endPiece.rowNum}`;
+    }
+
+    // Note: startPiece.piece is the piece to promote to
+    if (specialMoves.promotion) {
+      notation += `=${pieceLetter}`;
+    }
+  } else if (specialMoves.capture) {
+    // If startPiece is capturing endPiece
+    notation = `${pieceLetter}x${endPiece.colLetter}${endPiece.rowNum}`;
+  } else {
+    // Normal move for any piece except pawns
+    notation = `${pieceLetter}${endPiece.colLetter}${endPiece.rowNum}`;
+  }
+
+  if (specialMoves.check) {
+    notation += "+";
+  }
+
+  return notation;
 }

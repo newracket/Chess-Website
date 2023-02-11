@@ -1,5 +1,11 @@
 import { Component } from "react";
-import { Board, GameStats, PieceColor, PieceStats, SquareStats, StateFunctions } from "../Types";
+import {
+  Board,
+  GameStats,
+  PieceStats,
+  SquareStats,
+  StateFunctions,
+} from "../Types";
 import ChessPiece from "./ChessPiece";
 import MovableDot from "./MovableDot";
 
@@ -31,28 +37,29 @@ export default class ChessSquare extends Component<Props, State> {
     );
   }
 
+  setMouseOver() {
+    this.props.stateFunctions.mouseOverSquare(
+      this.props.squareStats.row,
+      this.props.squareStats.col
+    );
+  }
+
   render() {
-    const numToLetterDict: { [key: number]: string } = {
-      0: "a",
-      1: "b",
-      2: "c",
-      3: "d",
-      4: "e",
-      5: "f",
-      6: "g",
-      7: "h",
-    };
     let classes = this.props.squareStats.squareColor;
 
     if (this.props.pieceStats.selected) {
       classes += " selected";
     }
 
+    if (this.props.pieceStats.lastMoved) {
+      classes += " lastMoved";
+    }
+
     if (this.props.pieceStats.movable) {
       classes += " movable";
 
       if (this.props.pieceStats.piece) {
-        classes += " corners";
+        classes += " capturable";
       }
     }
 
@@ -65,7 +72,7 @@ export default class ChessSquare extends Component<Props, State> {
     }
 
     return (
-      <td className={classes as string}>
+      <td className={classes as string} onDragEnter={() => this.setMouseOver()}>
         {this.props.pieceStats.piece && (
           <ChessPiece
             pieceStats={this.props.pieceStats}
@@ -84,9 +91,11 @@ export default class ChessSquare extends Component<Props, State> {
           />
         )}
         {this.props.squareStats.row === 7 && (
-          <span className="lettering">{numToLetterDict[this.props.squareStats.col]}</span>
+          <span className="lettering">{this.props.pieceStats.colLetter}</span>
         )}
-        {this.props.squareStats.col === 7 && <span className="numbering">{8 - this.props.squareStats.row}</span>}
+        {this.props.squareStats.col === 7 && (
+          <span className="numbering">{this.props.pieceStats.rowNum}</span>
+        )}
       </td>
     );
   }
