@@ -199,7 +199,7 @@ export function isSquareOpenToCastle(
   row: number,
   col: number
 ): boolean {
-  if (board[row][col].piece) return true;
+  if (board[row][col].piece) return false;
 
   const newBoard: Board = JSON.parse(JSON.stringify(board));
   newBoard[row][col].piece = "king";
@@ -303,7 +303,6 @@ export function deselectAll(board: Board) {
   );
 }
 
-// Check should have + at end of notation
 export function getNotation(
   board: Board,
   startPiece: PieceStats,
@@ -337,6 +336,12 @@ export function getNotation(
   } else if (specialMoves.capture) {
     // If startPiece is capturing endPiece
     notation = `${pieceLetter}x${endPiece.colLetter}${endPiece.rowNum}`;
+  } else if (specialMoves.castle) {
+    if (endPiece.colLetter === "g") {
+      notation = "O-O";
+    } else {
+      notation = "O-O-O";
+    }
   } else {
     // Normal move for any piece except pawns
     notation = `${pieceLetter}${endPiece.colLetter}${endPiece.rowNum}`;
