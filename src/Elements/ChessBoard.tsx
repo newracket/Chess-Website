@@ -54,10 +54,6 @@ export default class ChessBoard extends Component<Props, State> {
       moves: [],
     };
 
-    for (let i = 0; i < 100; i++) {
-      this.state.moves.push(["e4", "e5"]);
-    }
-
     this.setBoard = this.setBoard.bind(this);
     this.setTurn = this.setTurn.bind(this);
     this.flipBoard = this.flipBoard.bind(this);
@@ -296,7 +292,7 @@ export default class ChessBoard extends Component<Props, State> {
       <DndProvider backend={HTML5Backend}>
         <div className="titleDiv">
           <Link to="/" className="back">
-            <FaArrowLeft/>
+            <FaArrowLeft />
             <span className="backText">Back</span>
           </Link>
 
@@ -304,11 +300,11 @@ export default class ChessBoard extends Component<Props, State> {
             {this.state.stalemate
               ? `Stalemate! Nobody wins.`
               : this.state.winner
-                ? `${
+              ? `${
                   this.state.winner.charAt(0).toUpperCase() +
                   this.state.winner.slice(1)
                 } wins!`
-                : `Player vs. ${this.props.pvc ? "Computer" : "Player"}`}
+              : `Player vs. ${this.props.pvc ? "Computer" : "Player"}`}
           </h1>
         </div>
 
@@ -316,7 +312,7 @@ export default class ChessBoard extends Component<Props, State> {
           <div className="chessBoardContainer">
             <table className="chessBoardTable">
               <tbody className="chessBoardBody">
-              {this.constructBoard(this.state.board)}
+                {this.constructBoard(this.state.board)}
               </tbody>
             </table>
           </div>
