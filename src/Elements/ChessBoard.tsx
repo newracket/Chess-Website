@@ -51,11 +51,12 @@ export default class ChessBoard extends Component<Props, State> {
       stalemate: false,
       computerMoving: false,
       moveNum: 0,
-      moves: [
-        ["d4", "e5"],
-        ["e4", "d5"],
-      ],
+      moves: [],
     };
+
+    for (let i = 0; i < 100; i++) {
+      this.state.moves.push(["e4", "e5"]);
+    }
 
     this.setBoard = this.setBoard.bind(this);
     this.setTurn = this.setTurn.bind(this);
@@ -295,7 +296,7 @@ export default class ChessBoard extends Component<Props, State> {
       <DndProvider backend={HTML5Backend}>
         <div className="titleDiv">
           <Link to="/" className="back">
-            <FaArrowLeft />
+            <FaArrowLeft/>
             <span className="backText">Back</span>
           </Link>
 
@@ -303,11 +304,11 @@ export default class ChessBoard extends Component<Props, State> {
             {this.state.stalemate
               ? `Stalemate! Nobody wins.`
               : this.state.winner
-              ? `${
+                ? `${
                   this.state.winner.charAt(0).toUpperCase() +
                   this.state.winner.slice(1)
                 } wins!`
-              : `Player vs. ${this.props.pvc ? "Computer" : "Player"}`}
+                : `Player vs. ${this.props.pvc ? "Computer" : "Player"}`}
           </h1>
         </div>
 
@@ -315,23 +316,25 @@ export default class ChessBoard extends Component<Props, State> {
           <div className="chessBoardContainer">
             <table className="chessBoardTable">
               <tbody className="chessBoardBody">
-                {this.constructBoard(this.state.board)}
+              {this.constructBoard(this.state.board)}
               </tbody>
             </table>
           </div>
 
-          {/*<table className="moveHistory">*/}
-          {/*  <h1 className="moveHistoryTitle">Move History</h1>*/}
-          {/*  {this.state.moves.map((move, i) => {*/}
-          {/*    return (*/}
-          {/*      <tr className="moveRow">*/}
-          {/*        <td className="moveNum">{i + 1}</td>*/}
-          {/*        <td className="move">{move[0]}</td>*/}
-          {/*        <td className="move">{move[1]}</td>*/}
-          {/*      </tr>*/}
-          {/*    );*/}
-          {/*  })}*/}
-          {/*</table>*/}
+          <div className="moveHistory">
+            <h1 className="moveHistoryTitle">Move History</h1>
+            {this.state.moves.map((move, i) => {
+              return (
+                <div className="moveRow">
+                  <div className="moveNum">{i + 1}.</div>
+                  <div className="moves">
+                    <div className="move">{move[0]}</div>
+                    <div className="move">{move[1]}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </DndProvider>
     );

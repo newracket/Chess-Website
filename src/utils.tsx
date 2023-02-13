@@ -342,7 +342,9 @@ export function getNotation(
     notation = `${pieceLetter}${endPiece.colLetter}${endPiece.rowNum}`;
   }
 
-  if (specialMoves.check) {
+  if (specialMoves.checkmate) {
+    notation += "#";
+  } else if (specialMoves.check) {
     notation += "+";
   }
 

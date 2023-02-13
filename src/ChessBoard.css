@@ -4,10 +4,15 @@
   position: absolute;
   top: 0;
   left: 0;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .titleDiv {
-  height: 15vh;
+  /*height: 15vh;*/
+  padding: 25px 0;
 
   display: flex;
   flex-direction: column;
@@ -21,6 +26,9 @@
 }
 
 .chessBoardMoveHistoryContainer {
+  width: 100%;
+  height: 80%;
+
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -75,8 +83,8 @@
 
 .chessPiece {
   cursor: pointer;
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
   /* -webkit-user-drag: none; */
   user-select: none;
 }
@@ -148,7 +156,7 @@
   padding: 5px 15px 5px 15px;
   cursor: pointer;
 
-  background-color: var(--lightgray);
+  background-color: rgb(150, 150, 150, 0.75);
   color: white;
   font-weight: bold;
   text-decoration: none;
@@ -179,12 +187,13 @@
 
 .moveHistory {
   display: inline-block;
-  width: 10vw;
+  width: 15vw;
+  height: 100%;
+  overflow-y: auto;
   margin-left: 30px;
   border-radius: 0.2rem;
 
   background-color: rgb(150, 150, 150, 0.5);
-  border: 2px solid var(--lightgray);
 
   color: white;
   font-size: 1.5rem;
@@ -196,36 +205,26 @@
 
   font-size: inherit;
   font-family: inherit;
-
-  border-bottom: 1px solid black;
 }
 
 .moveRow {
-  border-bottom: 1px solid black;
-
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
-}
-
-.moveNum {
-  padding: 20px 10px;
-  display: inline-block;
-
-  border-right: 1px solid black;
 }
 
 .moves {
   width: 100%;
-  display: inline-block;
 }
 
-.move:first-child {
-  border-right: 1px solid black;
+.moveNum {
+  padding: 5px 10px;
+  display: inline-block;
 }
 
 .move {
-  padding: 20px 0;
+  padding: 5px 0;
   display: inline-block;
   height: 100%;
+  width: 49%;
 }

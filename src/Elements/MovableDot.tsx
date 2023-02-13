@@ -12,7 +12,6 @@ import {
   GameType,
   PieceStats,
   PieceType,
-  PieceTypeValues,
   SpecialMoves,
   SquareStats,
   StateFunctions,
@@ -132,7 +131,9 @@ export default class ChessPiece extends Component<Props, State> {
         while (
           pieceToConvertTo === null ||
           pieceToConvertTo.toLowerCase() === "king" ||
-          !PieceTypeValues.includes(pieceToConvertTo.toLowerCase() as PieceType)
+          !["queen", "rook", "knight", "bishop"].includes(
+            pieceToConvertTo.toLowerCase()
+          )
         ) {
           pieceToConvertTo = prompt(
             "What piece do you want to promote the pawn to? Options are: queen, rook, knight, bishop"
