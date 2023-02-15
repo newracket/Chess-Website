@@ -88,7 +88,6 @@ export default class ChessPiece extends Component<Props> {
     const img = new Image();
     img.src = `${this.props.pieceStats.color}${this.props.pieceStats.piece}.png`;
 
-    console.log(img);
     e.dataTransfer.setDragImage(img, 40, 40);
 
     if (!this.props.pieceStats.selected) {

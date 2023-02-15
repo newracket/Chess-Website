@@ -5,6 +5,7 @@ import {
   GameType,
   PieceColor,
   PieceType,
+  SpecialMoves,
   StateFunctions,
 } from "../Types";
 import ChessSquare from "./ChessSquare";
@@ -12,6 +13,7 @@ import "../ChessBoard.css";
 import {
   checkForCheckmate,
   flipBoard,
+  getNotation,
   isKingInCheck,
   replacePieceValues,
 } from "../utils";
@@ -190,6 +192,14 @@ export default class ChessBoard extends Component<Props, State> {
       moved: undefined,
       lastMoved: true,
     };
+    const specialMoves: SpecialMoves = {
+      castle: false,
+      enPassant: false,
+      promotion: false,
+      capture: false,
+      check: false,
+      checkmate: false,
+    };
 
     // Clears all lastMoved properties
     this.state.board.forEach((row) =>
@@ -197,6 +207,10 @@ export default class ChessBoard extends Component<Props, State> {
     );
 
     // Makes computer move
+    if (toSquare.piece !== null) {
+      specialMoves.capture = true;
+    }
+
     replacePieceValues(toSquare, fromSquare, ["piece", "color", "moved"]);
     Object.assign(fromSquare, defaultPieceStats);
     toSquare.lastMoved = true;
@@ -219,11 +233,27 @@ export default class ChessBoard extends Component<Props, State> {
         this.state.board[fromPositionIndexes[0]][colNum],
         defaultPieceStats
       );
+
+      specialMoves.castle = true;
     }
 
     // Promoting pawn
-    if (toPositionIndexes[0] === 7 && toSquare.piece === "pawn") {
-      toSquare.piece = "queen";
+    if (toSquare.piece === "pawn") {
+      if (toPositionIndexes[0] === 7) {
+        toSquare.piece = "queen";
+        specialMoves.promotion = true;
+      }
+
+      if (
+        toPositionIndexes[1] !== fromPositionIndexes[1] &&
+        toSquare.piece === null
+      ) {
+        specialMoves.enPassant = true;
+        Object.assign(
+          this.state.board[toPosition[0]][fromPositionIndexes[1]],
+          defaultPieceStats
+        );
+      }
     }
 
     // Checks if move puts other king in check
@@ -232,6 +262,8 @@ export default class ChessBoard extends Component<Props, State> {
     if (kingPosition) {
       this.state.board[7 - kingPosition.row][7 - kingPosition.col].check = true;
       this.setCheck(this.state.board[kingPosition.row][kingPosition.col].color);
+
+      specialMoves.check = true;
     }
     // Checks if king is currently in check and move removes king from check
     else if (this.state.check) {
@@ -240,6 +272,14 @@ export default class ChessBoard extends Component<Props, State> {
     }
 
     const result = checkForCheckmate(this.state.board, this.state.turn);
+    if (result === GameType.Checkmate) {
+      specialMoves.checkmate = true;
+    }
+
+    this.state.moves[this.state.moves.length - 1].push(
+      getNotation(this.state.board, fromSquare, toSquare, specialMoves)
+    );
+
     if (result !== GameType.Continue) {
       this.setWinner(this.state.turn === "white" ? "black" : "white", result);
     }
