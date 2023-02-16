@@ -216,7 +216,10 @@ export default class ChessBoard extends Component<Props, State> {
     toSquare.lastMoved = true;
 
     // Moves rook when castling
-    if (toSquare.piece === "king") {
+    if (
+      toSquare.piece === "king" &&
+      Math.abs(fromPositionIndexes[1] - toPositionIndexes[1]) === 2
+    ) {
       let colNum = 7;
       let offset = -1;
       if (fromPositionIndexes[1] - toPositionIndexes[1] === 2) {
