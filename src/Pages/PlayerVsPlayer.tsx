@@ -1,6 +1,6 @@
 import React from "react";
 import Base from "./Base";
-import ChessBoard from "./Elements/ChessBoard";
+import ChessBoard from "../Elements/ChessBoard";
 
 export default class PlayerVsPlayer extends React.Component {
   render() {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Base from "./Base";
-import "./StartScreen.css";
+import "../Styles/StartScreen.css";
 
 export default class StartScreen extends React.Component {
   render() {

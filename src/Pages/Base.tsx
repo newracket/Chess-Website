@@ -1,5 +1,5 @@
 import React from "react";
-import "./Base.css";
+import "../Styles/Base.css";
 
 interface Props {
   in: boolean;

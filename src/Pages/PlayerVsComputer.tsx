@@ -1,6 +1,6 @@
 import React from "react";
 import Base from "./Base";
-import ChessBoard from "./Elements/ChessBoard";
+import ChessBoard from "../Elements/ChessBoard";
 
 // @ts-ignore
 import * as jsChessEngine from "js-chess-engine";

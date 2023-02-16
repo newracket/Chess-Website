@@ -24,7 +24,7 @@ export function findMoves(
   const moves: RowCol[] = [];
 
   // All tiles with possible moves for knight
-  // Separate array for each movement path (diaganol towards top left, straight up, etc)
+  // Separate array for each movement path (diagonal towards top left, straight up, etc)
   // [Row adjustment, Column adjustment]
   const tilesWithPossibleMoves: number[][][] = [];
 

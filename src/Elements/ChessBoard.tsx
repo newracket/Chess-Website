@@ -9,7 +9,7 @@ import {
   StateFunctions,
 } from "../Types";
 import ChessSquare from "./ChessSquare";
-import "../ChessBoard.css";
+import "../Styles/ChessBoard.css";
 import {
   checkForCheckmate,
   flipBoard,

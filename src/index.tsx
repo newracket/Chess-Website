@@ -1,10 +1,10 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import StartScreen from "./StartScreen";
+import StartScreen from "./Pages/StartScreen";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import PlayerVsPlayer from "./PlayerVsPlayer";
-import PlayerVsComputer from "./PlayerVsComputer";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import PlayerVsPlayer from "./Pages/PlayerVsPlayer";
+import PlayerVsComputer from "./Pages/PlayerVsComputer";
 
 const container = document.getElementById("root");
 const root = createRoot(container!);
